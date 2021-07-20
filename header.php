@@ -41,7 +41,7 @@ HELLO;
             } else {
                 echo <<<HELLO
                 <div class="text-end">
-                    <button type="button" class="btn btn-primary me-2">Login / Sign Up</button>
+                    <button type="button" class="btn btn-primary me-2" onclick="document.location='Sign_In/Sign_In.php'">Login / Sign Up</button>
                 </div>
 HELLO;
             }
