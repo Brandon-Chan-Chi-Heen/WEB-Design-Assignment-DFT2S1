@@ -13,7 +13,7 @@ Please require env_variables.php in all your files.
 
 change sevRoot accordingly
 sevRoot : use this for any href links or resource(images) hyperlinks
-ex: <img src="$sevRoot/resources/user_icon.png" alt="user" width="32" height="32" class="rounded-circle mx-2">
+ex: ```"<img src="$sevRoot/resources/user_icon.png" alt="user" width="32" height="32" class="rounded-circle mx-2">```
 
 docRoot: use this for php functions such as include, require, etc
 
