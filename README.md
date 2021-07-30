@@ -11,7 +11,7 @@
 edit 1:
 Ignore the above. <br />
 
-#NOTE 1
+# NOTE 1
 Please require env_variables.php in all your files. <br />
 
 change sevRoot accordingly <br />
