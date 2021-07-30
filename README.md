@@ -21,7 +21,7 @@ ex: <br />
 
 docRoot: use this for php functions such as include, require, etc <br />
 
-things can turn out very weird if you try something like <br />
+php will complain if you try something like <br />
 ```php
 require("/utility/utility.php");
 ``` 
