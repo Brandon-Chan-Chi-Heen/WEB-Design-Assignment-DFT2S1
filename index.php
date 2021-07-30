@@ -1,3 +1,15 @@
+<?php
+session_start();
+require_once dirname(__FILE__) . "/env_variables.php";
+
+$isLogin = !empty($_SESSION['fullName']) ? true : false;
+
+
+//
+if (isset($_SESSION)) {
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,7 +25,8 @@
 </head>
 
 <body class="bg-dark text-white">
-    <?php include "header.php" ?>
+    <?php include("$docRoot/header.php") ?>
+
     <section>
         <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
@@ -50,7 +63,7 @@
                     <img width="100%" src="resources/carousel-1.jpg" alt="" class="carousel-img">
 
 
-                    <div class="container">
+                    <div class="container ">
                         <div class="carousel-caption text-end">
                             <h1>One more for good measure.</h1>
                             <p>Some representative placeholder content for the third slide of this carousel.</p>
@@ -71,6 +84,8 @@
         <div></div>
 
     </section>
+
+
 
     <section id="Schedule" class="schedule">
         <h1 class="my-3 text-center display-1">Schedule</h1>
@@ -109,49 +124,18 @@ HELLO;
                     ?>
                 </div>
             </div>
-            <div href="" class="my-3 container">
-                <a href="" class="my-5 text-decoration-none display-6">More Past Events...</a>
+            <div class="my-3 container">
+                <a href="<?php echo "$sevRoot/Event/event.php" ?>" class="my-5 text-decoration-none display-6">More Past Events...</a>
             </div>
         </div>
     </section>
 
     <section class="container">
-        <h1 id="About-Us" class="my-3 text-center display-1 py-4">About Us</h1>
-        <p class="text-center text-white display-6">BYIC is a club in collaboration with Bursa Malaysia and LifeChamp that aims to cultivate young investors with financial literacy and investment literacy.</p>
-
-        <div class="container text-center mt-5">
-            <div class="row">
-                <div class="col-lg-4">
-                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
-                        <title>ddd</title>
-                        <rect width="100%" height="100%" fill="#777" /><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
-                    </svg>
-
-                    <h2>Vice President</h2>
-                    <p>Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
-                </div>
-                <div class="col-lg-4">
-                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#777" /><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
-                    </svg>
-
-                    <h2>President</h2>
-                    <p>Another exciting bit of representative placeholder content. This time, we've moved on to the second column.</p>
-                </div>
-                <div class="col-lg-4">
-                    <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false">
-                        <title>Placeholder</title>
-                        <rect width="100%" height="100%" fill="#777" /><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
-                    </svg>
-
-                    <h2>Secretary</h2>
-                    <p>And lastly this, the third column of representative placeholder content.</p>
-                </div>
-            </div>
+        <h6 id="About-Us" class="my-3 text-center display-1 py-4">About Us</h6>
+        <p class="text-center text-white ">BYIC is a club in collaboration with Bursa Malaysia and LifeChamp that aims to cultivate young investors with financial literacy and investment literacy.</p>
     </section>
 
-    <?php include "footer.html" ?>
+    <?php include "$docRoot/footer.php" ?>
 </body>
 
 </html>

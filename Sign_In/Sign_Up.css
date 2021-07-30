@@ -1,0 +1,19 @@
+html,
+body {
+  height: 100%;
+}
+
+.form-sign-up {
+  padding: 25px 2.5%;
+  margin: 100px auto;
+  max-width: 544px;
+
+  border-radius: 20px;
+}
+
+label,
+input {
+  margin: auto;
+  width: 100%;
+  max-width: 244px;
+}

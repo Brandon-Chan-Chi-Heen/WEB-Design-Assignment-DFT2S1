@@ -1,12 +1,19 @@
 <?php
-require_once('../utility/utility.php');
+session_start();
+require_once dirname(__FILE__) . "/../env_variables.php";
+require_once "$docRoot/utility/utility.php";
+
+setSession('brandoncch-wm20@student.tarc.edu.my');
+$isLogin = true;
 
 
 // post request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
+
+        $email = !empty($_POST['email']) ? $_POST['email'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
+
 
         $validData = validifyLoginData($email, $password);
         $validCredentials = false;
@@ -16,7 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($validCredentials) {
             setSession($email);
-            header('location: ../index.php');
+            // echo "<script>alert('Success, Redirecting to Home Page');</script>";
+            header("location: $sevRoot/index.php");
         }
     }
 }
@@ -41,12 +49,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="Sign_In.css" rel="stylesheet">
 </head>
 
-<body class="text-center">
+<body class="bg-dark text-center">
+    <?php include "$docRoot/header.php" ?>
 
-    <div class="form-signin">
+    <div class="form-signin container bg-white">
         <form action="Sign_In.php" method="POST">
-            <!-- <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+            <h1 class="">Sign In</h1>
 
             <div class="form-floating">
                 <input name="email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
@@ -58,14 +66,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="checkbox mb-3">
-                <label>
+                <label class="">
                     <input type="checkbox" value="remember-me"> Remember me
                 </label>
             </div>
+
+            <div class="my-3">
+                <a href="" class="px-3">Forgot Password</a>
+                <a href="<?php echo "$sevRoot/Sign_In/Sign_Up.php" ?>" class="px-3">Register Here</a>
+            </div>
             <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-            <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
         </form>
     </div>
+    <br>
 </body>
 
 </html>

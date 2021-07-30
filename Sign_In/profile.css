@@ -1,0 +1,33 @@
+html,
+body {
+  height: 100%;
+}
+
+.form-sign-up img {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+}
+
+.form-sign-up {
+  position: relative;
+  padding: 25px 2.5%;
+  margin: 200px auto;
+  max-width: 544px;
+
+  border-radius: 20px;
+}
+.form-sign-up form {
+  margin-top: 100px;
+}
+
+/* label,
+input {
+  margin: auto;
+  width: 100%;
+  max-width: 244px;
+} */
