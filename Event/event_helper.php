@@ -34,6 +34,8 @@ HELLO;
                 echo $event_List;
                 $pictureNumber++;
             }
+        $result->free();
+        $con->close();
         }
         
     }
