@@ -1,0 +1,31 @@
+html,
+body {
+  height: 100%;
+}
+
+#admin-sidebar {
+  float: left;
+  height: 100%;
+  width: 280px;
+}
+
+section {
+  width: calc(100% - 280px);
+  overflow: hidden;
+  padding: 100px;
+}
+
+.event-list {
+  margin-top: 50px;
+  width: 100%;
+  border-spacing: 10px;
+  padding: 5px;
+  border-collapse: separate;
+}
+
+.event-list th,
+.event-list td {
+  padding: 12px;
+  color: black;
+  background-color: white;
+}
