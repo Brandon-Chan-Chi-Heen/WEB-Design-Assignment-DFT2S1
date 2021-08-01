@@ -11,9 +11,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
         $email = isset($_POST['email']) ? $_POST['email'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $confirmPassword = isset($_POST['password']) ? $_POST['password'] : '';
 
-        $validNames = validifyNames($firstName, $lastName);
-        $validData = validifyLoginData($email, $password);
+        $regExp = "/^[a-zA-Z\s]*$/";
+        $validFirstName = false;
+        $validLastName = false;
+
+        if (!empty($firstName) && preg_match($regExp, $firstName)) {
+            $validFirstName = true;
+        }
+
+        if (!empty($firslastNametName) && preg_match($regExp, $lastName)) {
+            $validLastName = true;
+        }
+
+        $validNames = $validFirstName && $validLastName;
+
+        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
+        $validEmail = false;
+        if (!empty($email) && preg_match($regExp, $email)) {
+            $validEmail = true;
+        }
+
+        $validPassword = false;
+        if (!empty($password) && !empty($confirmPassword) && $password == $confirmPassword) {
+            $validPassword = true;
+        }
+
+        $validData = $validPassword && $validEmail;
 
         // attempt to register
         // error upon same email
@@ -71,24 +96,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <link href="Sign_Up.css" rel="stylesheet">
 
-    <script>
-        function validate() {
-            $()
-        }
-    </script>
 </head>
 
 <body class="bg-dark text-center">
     <?php include "$docRoot/header.php" ?>
 
     <div class="form-sign-up container bg-white">
-
         <form class="row g-3 needs-validation" action="Sign_Up.php" method="POST" novalidate>
             <h1 class="">Sign Up</h1>
 
             <div class="col-md-6 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
-                <input name="firstName" type="text" class="form-control" id="firstNameInput" placeholder="John" required>
+                <input name="firstName" type="text" class="form-control " id="firstNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($firstName)) echo $firstName; ?>" placeholder="John" required>
                 <div class="invalid-feedback">
                     Please a valid First name
                 </div>
@@ -99,9 +118,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="col-md-6 mb-3">
                 <label for="lastNameInput" class="form-label">Last Name</label>
-                <input name="lastName" type="text" class="form-control" id="lastNameInput" placeholder="Doe" required>
+                <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($lastName)) echo $lastName; ?>" placeholder="Doe" required>
                 <div class="invalid-feedback">
-                    Please a valid Last Name
+                    Please enter a valid Last Name
                 </div>
                 <div class="valid-feedback">
                     Looks good!
@@ -110,7 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="col-md-12 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
-                <input name="email" type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
+                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" value="<?php if (isset($email)) echo $email; ?>" placeholder="name@example.com" required>
                 <div class="invalid-feedback">
                     Please enter a valid email
                 </div>
@@ -119,6 +138,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-md-6 mb-3">
                 <label for="passwordInput">Password</label>
                 <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" required>
+                <div class="invalid-feedback">
+                    Password Cannot Be Empty
+                </div>
             </div>
             <div class="col-md-6 mb-3">
                 <label for="confirmPasswordInput">Confirm Password</label>
@@ -139,32 +161,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button class="btn btn-primary" type="submit">Register</button>
             </div>
         </form>
+
+        <script>
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            (function() {
+                'use strict'
+
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var form = document.getElementsByClassName('needs-validation')[0];
+                console.log(form);
+
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+
+            })()
+        </script>
     </div>
     <br>
-
-    <script>
-        // Example starter JavaScript for disabling form submissions if there are invalid fields
-        (function() {
-            'use strict'
-
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var forms = document.querySelectorAll('.needs-validation')
-
-            // Loop over them and prevent submission
-            Array.prototype.slice.call(forms)
-                .forEach(function(form) {
-                    console.log(form);
-                    form.addEventListener('submit', function(event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault()
-                            event.stopPropagation()
-                        }
-
-                        form.classList.add('was-validated')
-                    }, false)
-                })
-        })()
-    </script>
 </body>
 
 </html>

@@ -5,7 +5,7 @@ require_once "$docRoot/utility/utility.php";
 
 setSession('brandoncch-wm20@student.tarc.edu.my');
 $isLogin = true;
-
+$emptyPassword = false;
 
 // post request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -15,7 +15,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = isset($_POST['password']) ? $_POST['password'] : '';
 
 
-        $validData = validifyLoginData($email, $password);
+        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
+        $validEmail = false;
+        if (!empty($email) && preg_match($regExp, $email)) {
+            $validEmail = true;
+        }
+
+        $emptyPassword = true;
+        if (!empty($password)) {
+            $emptyPassword = false;
+        }
+
+        $validData = !$emptyPassword && $validEmail;
         $validCredentials = false;
         if ($validData) {
             $validCredentials = processLogin($email, $password);
@@ -28,8 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-
-
 ?>
 
 <!doctype html>
@@ -53,16 +62,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include "$docRoot/header.php" ?>
 
     <div class="form-signin container bg-white">
-        <form action="Sign_In.php" method="POST">
+
+        <form class="needs-validation" action="Sign_In.php" method="POST" novalidate>
             <h1 class="">Sign In</h1>
 
             <div class="form-floating">
-                <input name="email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
+
+                <input name="email" type="email" class="form-control 
+                <?php if (isset($validEmail)) {
+                    if (!$validEmail) {
+                        echo " is-invalid";
+                    }
+                }
+                ?>" id="floatingEmail" placeholder="name@example.com" value="<?php if (isset($email)) echo $email; ?>" required>
+                <label for="floatingEmail">Email address</label>
+
+                <div class="invalid-feedback">
+                    Please enter a valid email
+                </div>
             </div>
             <div class="form-floating">
-                <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <input name="password" type="password" class="form-control 
+                <?php if ($emptyPassword) {
+                    echo " is-invalid";
+                }
+                ?>" id="floatingPassword" placeholder="Password" required>
+
                 <label for="floatingPassword">Password</label>
+                <div class="invalid-feedback">
+                    Password Cannot Be Empty
+                </div>
             </div>
 
             <div class="checkbox mb-3">
@@ -75,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <a href="" class="px-3">Forgot Password</a>
                 <a href="<?php echo "$sevRoot/Sign_In/Sign_Up.php" ?>" class="px-3">Register Here</a>
             </div>
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="return validateForm()">Sign in</button>
         </form>
     </div>
     <br>

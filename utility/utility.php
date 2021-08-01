@@ -43,6 +43,7 @@ function processLogin($email, $password)
         consoleLog("invalid column values for query");
         return false;
     }
+
     $arrayCount = count($result);
     $validCreds = false;
     if ($arrayCount === 1) {
@@ -62,7 +63,7 @@ class Database
     private const DB_USER = 'Assignment';
     private const DB_NAME = 'assignment';
 
-    public $con;
+    private $con;
     public $queryResult;
 
     private const tableColNames = array(
@@ -72,6 +73,18 @@ class Database
             "first_name",
             "last_name",
             "password"
+        ),
+        "display_event" => array(
+            "Event_Title",
+            "Event_Description",
+            "Event_Price"
+        ),
+        "participants" => array(
+            "user_id",
+            "last_name",
+            "first_name",
+            "gender",
+            "Event_Title"
         )
     );
 
@@ -82,9 +95,7 @@ class Database
             die('Connect Error (' . mysqli_connect_errno($this->con) . ') '
                 . mysqli_connect_error($this->con));
         }
-        $this->queryResult = null;
     }
-
 
     function disconnect()
     {
@@ -94,9 +105,9 @@ class Database
         mysqli_close($this->con);
     }
 
-    function select($columnArray, $whereStatements, $table = 'user')
+    function select($columnArray, $whereStatements, $table = 'user', $fetchAll = true)
     {
-        if (array_intersect($columnArray, self::tableColNames[$table]) != $columnArray) {
+        if (array_intersect($columnArray, self::tableColNames[$table]) != $columnArray && $columnArray[0] != "*") {
             consoleLog("Invalid column name");
             return null;
         }
@@ -106,10 +117,20 @@ class Database
             $queryStatement .= ", $col";
         }
 
-        $queryStatement .= " FROM $table WHERE $whereStatements;";
+        if ($whereStatements == "") {
+            $queryStatement .= " FROM $table";
+        } else {
+            $queryStatement .= " FROM $table WHERE $whereStatements;";
+        }
 
         $this->queryResult = mysqli_query($this->con, $queryStatement);
+
         return mysqli_fetch_all($this->queryResult);
+    }
+
+    function getQueryResult()
+    {
+        return $this->queryResult;
     }
 
     function insert($columnArray, $values, $table = 'user')
@@ -167,22 +188,6 @@ class Database
         $fullName = $nameArray[0] . ' ' .  $nameArray[1];
         return $fullName;
     }
-}
-
-function validifyLoginData($email, $password)
-{
-    $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
-    $validEmail = false;
-    if (!empty($email) && preg_match($regExp, $email)) {
-        $validEmail = true;
-    }
-
-    $emptyPassword = true;
-    if (!empty($password)) {
-        $emptyPassword = false;
-    }
-
-    return $validEmail && !$emptyPassword;
 }
 
 function validifyNames($firstName, $lastName)

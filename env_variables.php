@@ -11,5 +11,6 @@
 // ex: project in C:\xampp\htdocs\assignment\
 // sevRoot = "\assignment"
 // docRoot = "C:\xampp\htdocs" . "\assignment" = "C:\xampp\htdocs\assignment"
-$sevRoot = "";
+$sevRoot = "/assignment";
 $docRoot = $_SERVER["DOCUMENT_ROOT"] . $sevRoot;
+$isLogin = false;

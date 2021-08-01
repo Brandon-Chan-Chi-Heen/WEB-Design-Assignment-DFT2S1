@@ -29,7 +29,6 @@ $existingEmail = 'hello@gmail.com';
 <body class="bg-dark text-center">
     <?php include "$docRoot/header.php" ?>
 
-
     <div class="form-sign-up container bg-white">
         <img src="<?php echo "$sevRoot/resources/user_icon.png" ?>" alt="user" class="rounded-circle">
         <form class="row g-3 needs-validation" action="Sign_Up.php" method="POST" novalidate>

@@ -30,18 +30,14 @@ include "$docRoot/utility/utility.php";
                     Home
                 </a>
             </li>
-            <li>
-                <a href="#" class="nav-link text-white">
-                    Dashboard
-                </a>
-            </li>
+
             <li>
                 <a href="<?php echo "$sevRoot/admin_panel/event_admin.php" ?>" class="nav-link text-white active">
                     Events
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link text-white">
+                <a href="<?php echo "$sevRoot/admin_panel/participants_admin.php" ?>" class="nav-link text-white">
                     Participants
                 </a>
             </li>

@@ -4,14 +4,14 @@ body {
 }
 
 #admin-sidebar {
-  float: left;
+  position: fixed;
   height: 100%;
   width: 280px;
 }
 
 section {
   width: calc(100% - 280px);
-  overflow: hidden;
+  float: right;
   padding: 100px;
 }
 
