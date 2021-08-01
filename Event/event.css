@@ -1,5 +1,5 @@
 /* Page Body Styles */
-body {
+section.bodyDetails {
 	width:95%;
 	min-width:640px;
 	max-width:960px;
