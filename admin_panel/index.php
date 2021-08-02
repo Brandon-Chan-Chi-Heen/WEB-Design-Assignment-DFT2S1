@@ -25,13 +25,19 @@ include "$docRoot/utility/utility.php";
         </a>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="<?php echo "$sevRoot/admin_panel/index.php" ?>" class="nav-link active">
+                    Home
+                </a>
+            </li>
+
             <li>
                 <a href="<?php echo "$sevRoot/admin_panel/event_admin.php" ?>" class="nav-link text-white">
                     Events
                 </a>
             </li>
             <li>
-                <a href="<?php echo "$sevRoot/admin_panel/participants_admin.php" ?>" class="nav-link text-white active">
+                <a href="<?php echo "$sevRoot/admin_panel/participants_admin.php" ?>" class="nav-link text-white">
                     Participants
                 </a>
             </li>
@@ -44,7 +50,6 @@ include "$docRoot/utility/utility.php";
         <hr>
         <div class="dropdown">
             <a href="#" class="d-block text-white text-decoration-none dropdown-toggle dropdown-toggle-split" id="dropdownUser1" data-bs-toggle="dropdown">
-                <!-- <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle mx-2"> -->
                 <img src="<?php echo "$sevRoot/resources/user_icon.png" ?> " alt="user" width="32" height="32" class="rounded-circle mx-2">
             </a>
             <ul class="dropdown-menu">
@@ -57,29 +62,28 @@ include "$docRoot/utility/utility.php";
         </div>
     </div>
     <section class="text-white">
-        <h1>Participants</h1>
+        <h1>Events</h1>
 
-        <button class="btn btn-primary">Add Participant</button>
+        <button class="btn btn-primary">Create New Event</button>
         <table class="event-list">
-            <tr class="text-center">
-                <th style="width:15%;">First Name</th>
-                <th style="width:15%;">Last Name</th>
-                <th style="width:15%;">Gender</th>
-                <th style="width:40%; text-align:left;">Event</th>
-                <th style="width:15%;">Actions</th>
+            <tr>
+                <th style="width:40%;">Event Name</th>
+                <th style="width:15%;">Fee</th>
+                <th style="width:15%;">Number of Participants</th>
+                <th style="width:15%;">Max slots</th>
+                <th style="width:20%;">Actions</th>
             </tr>
             <?php
             $db = new Database();
-            $result = $db->select(array("first_name", "last_name", "gender", "Event_Title"), "", "participants");
+            $result = $db->select(array("*"), "", "display_event");
 
             foreach ($result as $row) {
                 echo <<<HELLO
-                <tr class="text-center">
-
+                <tr>
                     <td>{$row[0]}</td>
-                    <td>{$row[1]}</td>
                     <td>{$row[2]}</td>
-                    <td style="text-align:left;">{$row[3]}</td>
+                    <td>Number of Participants</td>
+                    <td>Max slots</td>
                     <td>
                         <button class="btn btn-primary">Edit</button>
                         <button class="btn btn-danger">Delete</button>

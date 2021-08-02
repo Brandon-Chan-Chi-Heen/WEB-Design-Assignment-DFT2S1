@@ -64,11 +64,11 @@ include "$docRoot/utility/utility.php";
         <button class="btn btn-primary">Create New Event</button>
         <table class="event-list">
             <tr>
-                <th style="width:60%;">Event Name</th>
-                <th style="width:10%;">Fee</th>
-                <th style="width:10%;">Number of Participants</th>
-                <th style="width:10%;">Max slots</th>
-                <th style="width:10%;">Actions</th>
+                <th style="width:40%;">Event Name</th>
+                <th style="width:15%;">Fee</th>
+                <th style="width:15%;">Number of Participants</th>
+                <th style="width:15%;">Max slots</th>
+                <th style="width:15%;">Actions</th>
             </tr>
             <?php
             $db = new Database();
