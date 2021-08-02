@@ -20,13 +20,13 @@
                     <div class="col-2-3 specials">
                         <div class="Details">
                             <div class="uploadEdit">
-                                <h3><a href="" class="bookmark">🔖</a></h3>
+                                <h3><button onclick="addBookmarkFunction()" class="addBookmarkButton">🔖</button></h3>
                             </div>
                             <h1>$row->Event_Title</h1>
                             <p>$row->Event_Description</p>
                         </div>
                         <div class="price">
-                            <h3><a href="" class="addToCart">🛒</a>$$row->Event_Price</h3>
+                            <h3><button onclick="addToCartFunction()" class="addToCart">🛒</button>$$row->Event_Price</h3>
                             <a href="" class="enrollNow"><h3>Enroll Now</h3></a>
                         </div>
                     </div>
@@ -37,6 +37,12 @@ HELLO;
         $result->free();
         $con->close();
         }
+        
+    }
+    function addBookmarkFunction(){
+        
+    }
+    function addToCartFunction(){
         
     }
 

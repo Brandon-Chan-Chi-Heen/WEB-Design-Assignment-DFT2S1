@@ -15,7 +15,7 @@
         <?php include "../header.php" ?>
         <?php include "event_helper.php" ?>
         <section class="bodyDetails">
-            <h1>Event</h1>
+            <h1>Event List</h1>
 <!--        <a href="" class="delete">Delete</a>
             <a href="" class="editButton">Edit</a>
             <a href="" class="uploadButton">Upload</a>  -->

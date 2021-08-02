@@ -50,12 +50,10 @@ div.col-2-3{
 	width: 67%;
 }
 
-a.addToCart {
-    background-color: transparent;
+button.addToCart {
     text-decoration: none;
 }
-a.bookmark {
-    background-color: transparent;
+button.addBookmarkButton {
     text-decoration: none;
 }
 
