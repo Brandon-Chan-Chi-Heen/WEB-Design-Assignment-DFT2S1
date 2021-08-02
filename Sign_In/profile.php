@@ -4,11 +4,43 @@ require_once dirname(__FILE__) . "/../env_variables.php";
 require_once "$docRoot/utility/utility.php";
 $isLogin = !empty($_SESSION['fullName']) ? true : false;
 
-$existingFirstName = 'ali';
-$existingLastName = "Bin Bakar";
+$firstName = 'ali';
+$lastName = "Bin Bakar";
 
-$existingEmail = 'hello@gmail.com';
+$email = 'hello@gmail.com';
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST)) {
+        $firstName = !empty($_POST['firstName']) ? $_POST['firstName'] : 'ali';
+        $lastName = !empty($_POST['lastName']) ? $_POST['lastName'] : 'Bin Bakar';
+        $email = !empty($_POST['email']) ? $_POST['email'] : 'hello@gmail.com';
+        $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $confirmPassword = isset($_POST['password']) ? $_POST['password'] : '';
+
+        $regExp = "/^[a-zA-Z\s]*$/";
+        $changeFirstName = false;
+        $changeLastName = false;
+
+        if (preg_match($regExp, $firstName) && !empty($firstName)) {
+            $changeFirstName = true;
+        }
+
+        if (!empty($lastName) && preg_match($regExp, $lastName)) {
+            $changeLastName = true;
+        }
+
+        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
+        $changeEmail = false;
+        if (!empty($email) && preg_match($regExp, $email)) {
+            $changeEmail = true;
+        }
+
+        $changePassword = false;
+        if (!empty($password) && !empty($confirmPassword) && $password == $confirmPassword) {
+            $changePassword = true;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,58 +63,40 @@ $existingEmail = 'hello@gmail.com';
 
     <div class="form-sign-up container bg-white">
         <img src="<?php echo "$sevRoot/resources/user_icon.png" ?>" alt="user" class="rounded-circle">
-        <form class="row g-3 needs-validation" action="Sign_Up.php" method="POST" novalidate>
-
-            <div class="col-md-6 mb-3 px-3">
-                <label for="firstNameInput" class="form-label col-md-12">First Name</label>
-                <div class="row ">
-                    <div class="col-md-9">
-                        <input name="firstName" type="text" class="col-md-8 form-control" id="firstNameInput" placeholder="<?php echo $existingFirstName ?>" required>
-                    </div>
-
-                    <button class="btn btn-primary col-md-3">
-                        Edit
-                    </button>
-                    <div class="invalid-feedback">
-                        Please a valid First name
-                    </div>
+        <form class="row g-3 needs-validation " action="profile.php" method="POST" novalidate>
+            <div class="col-md-6 mb-3">
+                <label for="firstNameInput" class="form-label">First Name</label>
+                <input name="firstName" type="text" class="form-control" id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
+                <div class="invalid-feedback">
+                    Please a valid First name
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3 px-3">
+            <div class="col-md-6 mb-3">
                 <label for="lastNameInput" class="form-label">Last Name</label>
-                <div class="row ">
-                    <div class="col-md-9">
-                        <input name="lastName" type="text" class="form-control" id="lastNameInput" placeholder="<?php echo $existingLastName ?>" required>
-                    </div>
-
-                    <button class="btn btn-primary col-md-3">
-                        Edit
-                    </button>
-                    <div class="invalid-feedback">
-                        Please a valid Last Name
-                    </div>
+                <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" placeholder="<?php if (isset($lastName)) echo $lastName; ?>" required>
+                <div class="invalid-feedback">
+                    Please enter a valid Last Name
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
                 </div>
             </div>
 
             <div class="col-md-12 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
-                <div class="row ">
-                    <div class="col-md-9">
-                        <input name="email" type="email" class="form-control" id="emailInput" placeholder="<?php echo $existingEmail ?>" required>
-                    </div>
-                    <button class="btn btn-primary col-md-3">
-                        Edit
-                    </button>
-                    <div class="invalid-feedback">
-                        Please enter a valid email
-                    </div>
+                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" placeholder="<?php if (isset($email)) echo $email; ?>" required>
+                <div class="invalid-feedback">
+                    Please enter a valid email
                 </div>
             </div>
 
             <div class="col-md-6 mb-3">
                 <label for="passwordInput">Password</label>
                 <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" required>
+                <div class="invalid-feedback">
+                    Password Cannot Be Empty
+                </div>
             </div>
             <div class="col-md-6 mb-3">
                 <label for="confirmPasswordInput">Confirm Password</label>
@@ -91,6 +105,20 @@ $existingEmail = 'hello@gmail.com';
                     Please enter the same password
                 </div>
             </div>
+            <?php if (isset($changeEmail) || isset($changeFirstName) || isset($changeLastName) || isset($changePassword)) {
+                if ($changeEmail || $changeFirstName || $changeLastName || $changePassword) {
+                    echo <<<HELLO
+                        <div class="col-md-12 mb-3  ">
+                            <h1 class="text-success"> Changed!</h1>
+                        </div>
+HELLO;
+                }
+            }
+
+
+            ?>
+
+
             <div class="col-12">
                 <button class="btn btn-primary" type="submit">Save</button>
             </div>
