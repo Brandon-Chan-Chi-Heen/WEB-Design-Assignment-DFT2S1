@@ -53,9 +53,6 @@ include "$docRoot/utility/utility.php";
                 <img src="<?php echo "$sevRoot/resources/user_icon.png" ?> " alt="user" width="32" height="32" class="rounded-circle mx-2">
             </a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Bookmarked Events</a></li>
-                <li><a class="dropdown-item" href="#">Registered Events</a></li>
-                <li><a class="dropdown-item" href="#">Payment Page</a></li>
                 <li><a class="dropdown-item" href="<?php echo "$sevRoot/Sign_In/profile.php" ?>">Edit Profile</a></li>
                 <li>
                     <hr class="dropdown-divider">
