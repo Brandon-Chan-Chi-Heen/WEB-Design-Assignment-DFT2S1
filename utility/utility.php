@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . "/../env_variables.php";
 // logging
 // console logs to browser using javascript
 function consoleLog(...$args)
@@ -31,10 +32,19 @@ function unSetSession()
     session_destroy();
 }
 
+function registerUser($firstName, $lastName, $email, $password)
+{
+    $db = new Database();
+    $passwordHash = $password; //md5($password);
+    $cols = array("email", "first_name", "last_name", "password");
+    $values = array($email, $firstName, $lastName, $passwordHash);
+    $db->insert($cols, $values, "user");
+}
+
 function processLogin($email, $password)
 {
     $db = new Database();
-    $passwordHash = md5($password);
+    $passwordHash = $password; //md5($password);
 
     $result = $db->loginPasswordEmail($email, $passwordHash);
 
@@ -51,6 +61,7 @@ function processLogin($email, $password)
     }
 
     $db->disconnect();
+    consoleLog($validCreds ? "true" : "false");
     return $validCreds;
     // else die because multiple records
 }
@@ -205,13 +216,4 @@ function validifyNames($firstName, $lastName)
     }
 
     return $validFirstName && $validLastName;
-}
-
-function registerUser($firstName, $lastName, $email, $password)
-{
-    $db = new Database();
-    $passwordHash = md5($password);
-    $cols = array("email", "first_name", "last_name", "password");
-    $values = array($email, $firstName, $lastName, $passwordHash);
-    $db->insert($cols, $values);
 }
