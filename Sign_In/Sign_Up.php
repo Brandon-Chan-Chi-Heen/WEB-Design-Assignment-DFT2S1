@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
         $email = isset($_POST['email']) ? $_POST['email'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
-        $confirmPassword = isset($_POST['password']) ? $_POST['password'] : '';
+        $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
 
         $regExp = "/^[a-zA-Z\s]*$/";
         $validFirstName = false;
@@ -34,8 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $validPassword = false;
-        if (!empty($password) && !empty($confirmPassword) && $password == $confirmPassword) {
-            $validPassword = true;
+        $emptyPassword = true;
+        if (!empty($password) && !empty($confirmPassword)) {
+            $emptyPassword = false;
+        }
+        if ($password == $confirmPassword) {
+            $validPassword = !$emptyPassword && true;
         }
 
         $validData = $validPassword && $validEmail;
@@ -46,35 +50,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // variables for error handling
         $duplicateEmail = false;
         $registerSuccess = false;
-        try {
-            registerUser($firstName, $lastName, $email, $password);
-            $registerSuccess = true;
-        } catch (Exception $e) {
-            // email exists or existing user
-            switch ($e->getCode()) {
-                case 1062:
-                    $duplicateEmail = true;
-                    $registerSuccess = false;
-                    consoleLog($e->getMessage());
-                    break;
-                default:
-                    consoleLog("unknown mysqli Error have occured");
+        if ($validData) {
+            try {
+                registerUser($firstName, $lastName, $email, $password);
+                $registerSuccess = true;
+            } catch (Exception $e) {
+                // email exists or existing user
+                consoleLog("Error occured");
+                switch ($e->getCode()) {
+                    case 1062:
+                        $duplicateEmail = true;
+                        consoleLog($duplicateEmail ? "true" : "false");
+                        $registerSuccess = false;
+                        consoleLog($e->getMessage());
+                        break;
+                    default:
+                        consoleLog("unknown mysqli Error have occured");
+                }
             }
         }
+        consoleLog($duplicateEmail ? "true" : "false");
+
 
         $validCredentials = false;
         if ($registerSuccess) {
             $validCredentials = processLogin($email, $password);
-        } // else {
-        //     die('Something went wrong when trying to Register');
-        // }
+        }
 
         if ($validCredentials) {
             setSession($email);
-            header('location: /assignment/.php');
-        } // else {
-        //     die("Something went wrong when trying to Log In");
-        // }
+            header("location: $sevRoot/index.php");
+        }
     }
 }
 
@@ -129,25 +135,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="col-md-12 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
-                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" value="<?php if (isset($email)) echo $email; ?>" placeholder="name@example.com" required>
-                <div class="invalid-feedback">
-                    Please enter a valid email
-                </div>
+                <input name="email" type="email" class="<?php
+                                                        echo "form-control ";
+                                                        if ($duplicateEmail) {
+                                                            echo "is-invalid ";
+                                                        }
+                                                        ?>" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" value="<?php if (isset($email)) echo $email; ?>" placeholder="name@example.com" required>
+                <?php
+                if (isset($duplicateEmail) && $duplicateEmail) {
+                    echo <<<HELLO
+                        <div class="invalid-feedback">
+                            Email Already Exists! Please Use Another Email.
+                        </div>
+HELLO;
+                } else {
+                    echo <<<HELLO
+                        <div class="invalid-feedback">
+                            Please enter a valid email
+                        </div>
+HELLO;
+                }
+                ?>
             </div>
 
             <div class="col-md-6 mb-3">
                 <label for="passwordInput">Password</label>
-                <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" required>
-                <div class="invalid-feedback">
+                <input name="password" type="password" class="form-control m-0 " id="passwordInput" placeholder="Password" required>
+
+                <div class="invalid-feedback" id="emptyPass">
                     Password Cannot Be Empty
                 </div>
+
             </div>
             <div class="col-md-6 mb-3">
                 <label for="confirmPasswordInput">Confirm Password</label>
-                <input name="password" type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
-                <div class="invalid-feedback">
+                <input name="confirmPassword" type="password" class="form-control " id="confirmPasswordInput" placeholder="Confirm Password" required>
+                <div class="invalid-feedback" id="diffPass">
                     Please enter the same password
                 </div>
+
             </div>
             <div class="col-12">
                 <div class="form-check" style="text-align: left">
@@ -168,10 +194,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'use strict'
 
                 // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var form = document.getElementsByClassName('needs-validation')[0];
-                console.log(form);
+                let form = document.getElementsByClassName('needs-validation')[0];
+                let password = document.getElementById('passwordInput');
+                let confirmPassword = document.getElementById('confirmPasswordInput');
+                let emptyPassDisplay = document.getElementById('emptyPass');
+                let diffPassDisplay = document.getElementById('diffPass');
+                let email = document.getElementById('emailInput');
 
+                console.log(form);
                 form.addEventListener('submit', function(event) {
+                    if (password.value === "" || confirmPassword === "") {
+                        password.setCustomValidity("Invalid Field");
+                        confirmPassword.setCustomValidity("Invalid Field");
+
+                        if (!emptyPassDisplay.classList.contains("invalid-feedback")) {
+                            emptyPassDisplay.classList.add("invalid-feedback")
+                            if (emptyPassDisplay.classList.contains("hidden")) {
+                                emptyPassDisplay.classList.remove("hidden");
+                            }
+                        }
+                        if (diffPassDisplay.classList.contains("invalid-feedback")) {
+                            diffPassDisplay.classList.remove("invalid-feedback")
+                            if (!diffPassDisplay.classList.contains("hidden")) {
+                                diffPassDisplay.classList.add("hidden");
+                            }
+                        }
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    if (password.value != confirmPassword.value) {
+                        password.setCustomValidity("Invalid Field");
+                        confirmPassword.setCustomValidity("Invalid Field");
+
+                        password.classList.add("is-invalid");
+                        confirmPassword.classList.add("is-invalid");
+
+                        if (emptyPassDisplay.classList.contains("invalid-feedback")) {
+                            emptyPassDisplay.classList.remove("invalid-feedback")
+                            if (!emptyPassDisplay.classList.contains("hidden")) {
+                                emptyPassDisplay.classList.add("hidden");
+                            }
+                        }
+                        if (!diffPassDisplay.classList.contains("invalid-feedback")) {
+                            diffPassDisplay.classList.add("invalid-feedback")
+                            if (diffPassDisplay.classList.contains("hidden")) {
+                                diffPassDisplay.classList.remove("hidden");
+                            }
+                        }
+
+                        event.preventDefault()
+                        event.stopPropagation()
+                    } else if (password.value == confirmPassword.value) {
+                        if (password.classList.contains("is-invalid")) {
+                            password.classList.remove("is-invalid");
+
+                        }
+                        if (confirmPassword.classList.contains("is-invalid")) {
+                            confirmPassword.classList.remove("is-invalid");
+
+                        }
+                        password.setCustomValidity("");
+                        confirmPassword.setCustomValidity("");
+                    }
                     if (!form.checkValidity()) {
                         event.preventDefault()
                         event.stopPropagation()
@@ -180,6 +264,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     form.classList.add('was-validated')
                 }, false)
 
+
+
+                <?php
+                if (isset($duplicateEmail) && $duplicateEmail) {
+                    echo <<<HELLO
+                        email.addEventListener('input', (event) => {
+                            if (email.value !== "$email") {
+                                email.classList.remove("is-invalid");
+                                console.log("valid Text")
+                            } else if (!email.classList.contains("is-invalid") && email.value === "$email") {
+                                email.classList.add("is-invalid");
+                                console.log("invalid Text")
+                            }
+                        }, false);
+HELLO;
+                }
+                ?>
             })()
         </script>
     </div>

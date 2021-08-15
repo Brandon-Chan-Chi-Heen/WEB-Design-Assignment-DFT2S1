@@ -3,8 +3,7 @@ session_start();
 require_once dirname(__FILE__) . "/../env_variables.php";
 require_once "$docRoot/utility/utility.php";
 
-setSession('brandoncch-wm20@student.tarc.edu.my');
-$isLogin = true;
+$isLogin = false;
 $emptyPassword = false;
 
 // post request
@@ -31,10 +30,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($validData) {
             $validCredentials = processLogin($email, $password);
         }
-
+        consoleLog($validCredentials  ? "true" : "false");
         if ($validCredentials) {
             setSession($email);
-            // echo "<script>alert('Success, Redirecting to Home Page');</script>";
+            echo "<script>alert('Success, Redirecting to Home Page');</script>";
             header("location: $sevRoot/index.php");
         }
     }
@@ -104,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <a href="" class="px-3">Forgot Password</a>
                 <a href="<?php echo "$sevRoot/Sign_In/Sign_Up.php" ?>" class="px-3">Register Here</a>
             </div>
-            <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="return validateForm()">Sign in</button>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
         </form>
     </div>
     <br>
