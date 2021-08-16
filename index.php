@@ -75,8 +75,6 @@ if (isset($_SESSION)) {
 
     </section>
 
-
-
     <section id="Schedule" class="schedule">
         <h1 class="my-3 text-center display-1">Schedule</h1>
         <span></span>
@@ -86,13 +84,21 @@ if (isset($_SESSION)) {
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     <?php
                     $numberOfItems = 3;
-                    $albumItems = <<<HELLO
+                    $priceArray = array(18.9, 20, 50);
+                    $quantityArray = array(1, 2, 4);
+                    $totalPriceArray = array();
+                    for ($i = 0; $i < $numberOfItems; $i++) {
+                        array_push($totalPriceArray, $priceArray[$i] * $quantityArray[$i]);
+                    }
+
+                    for ($i = 0; $i < $numberOfItems; $i++) {
+                        echo <<<HELLO
                         <div class="col">
                             <div class="card shadow-sm">
                                 <img src="resources/Investhink.jpg" alt="event" />
 
                                 <div class="card-body">
-                                    <p class="card-text text-dark">Lorem, ipsum dolor sit amet</p>
+                                    <p class="card-text text-dark">{$totalPriceArray[$i]}</p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-primary">Read more...</button>
@@ -107,9 +113,6 @@ if (isset($_SESSION)) {
                             </div>
                         </div>
 HELLO;
-
-                    for ($i = 0; $i < $numberOfItems; $i++) {
-                        echo $albumItems;
                     }
                     ?>
                 </div>

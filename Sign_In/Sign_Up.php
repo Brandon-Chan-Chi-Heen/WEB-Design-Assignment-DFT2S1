@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validFirstName = true;
         }
 
-        if (!empty($firslastNametName) && preg_match($regExp, $lastName)) {
+        if (!empty($lastName) && preg_match($regExp, $lastName)) {
             $validLastName = true;
         }
 
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validPassword = !$emptyPassword && true;
         }
 
-        $validData = $validPassword && $validEmail;
+        $validData = $validPassword && $validEmail && $validNames;
 
         // attempt to register
         // error upon same email
@@ -69,8 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
-        consoleLog($duplicateEmail ? "true" : "false");
-
 
         $validCredentials = false;
         if ($registerSuccess) {
@@ -137,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="<?php
                                                         echo "form-control ";
-                                                        if ($duplicateEmail) {
+                                                        if (isset($duplicateEmail) && $duplicateEmail) {
                                                             echo "is-invalid ";
                                                         }
                                                         ?>" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" value="<?php if (isset($email)) echo $email; ?>" placeholder="name@example.com" required>
@@ -189,11 +187,22 @@ HELLO;
         </form>
 
         <script>
-            // Example starter JavaScript for disabling form submissions if there are invalid fields
             (function() {
                 'use strict'
 
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                // utility functions
+                let removeClass = (element, first) => {
+                    if (element.classList.contains(first)) {
+                        element.classList.remove(first)
+                    }
+                }
+
+                let addClass = (element, first) => {
+                    if (!element.classList.contains(first)) {
+                        element.classList.add(first)
+                    }
+                }
+
                 let form = document.getElementsByClassName('needs-validation')[0];
                 let password = document.getElementById('passwordInput');
                 let confirmPassword = document.getElementById('confirmPasswordInput');
@@ -207,52 +216,36 @@ HELLO;
                         password.setCustomValidity("Invalid Field");
                         confirmPassword.setCustomValidity("Invalid Field");
 
-                        if (!emptyPassDisplay.classList.contains("invalid-feedback")) {
-                            emptyPassDisplay.classList.add("invalid-feedback")
-                            if (emptyPassDisplay.classList.contains("hidden")) {
-                                emptyPassDisplay.classList.remove("hidden");
-                            }
-                        }
-                        if (diffPassDisplay.classList.contains("invalid-feedback")) {
-                            diffPassDisplay.classList.remove("invalid-feedback")
-                            if (!diffPassDisplay.classList.contains("hidden")) {
-                                diffPassDisplay.classList.add("hidden");
-                            }
-                        }
+                        addClass(password, "is-invalid");
+                        addClass(confirmPassword, "is-invalid");
+
+                        addClass(emptyPassDisplay, "invalid-feedback");
+                        removeClass(emptyPassDisplay, "hidden");
+
+                        removeClass(diffPassDisplay, "invalid-feedback");
+                        addClass(diffPassDisplay, "hidden");
+
                         event.preventDefault()
                         event.stopPropagation()
-                    }
-                    if (password.value != confirmPassword.value) {
+                    } else if (password.value != confirmPassword.value) {
                         password.setCustomValidity("Invalid Field");
                         confirmPassword.setCustomValidity("Invalid Field");
 
-                        password.classList.add("is-invalid");
-                        confirmPassword.classList.add("is-invalid");
+                        addClass(password, "is-invalid");
+                        addClass(confirmPassword, "is-invalid");
 
-                        if (emptyPassDisplay.classList.contains("invalid-feedback")) {
-                            emptyPassDisplay.classList.remove("invalid-feedback")
-                            if (!emptyPassDisplay.classList.contains("hidden")) {
-                                emptyPassDisplay.classList.add("hidden");
-                            }
-                        }
-                        if (!diffPassDisplay.classList.contains("invalid-feedback")) {
-                            diffPassDisplay.classList.add("invalid-feedback")
-                            if (diffPassDisplay.classList.contains("hidden")) {
-                                diffPassDisplay.classList.remove("hidden");
-                            }
-                        }
+                        removeClass(emptyPassDisplay, "invalid-feedback");
+                        addClass(emptyPassDisplay, "hidden");
+
+                        addClass(diffPassDisplay, "invalid-feedback");
+                        removeClass(diffPassDisplay, "hidden");
 
                         event.preventDefault()
                         event.stopPropagation()
                     } else if (password.value == confirmPassword.value) {
-                        if (password.classList.contains("is-invalid")) {
-                            password.classList.remove("is-invalid");
+                        removeClass(password, "is-invalid");
+                        removeClass(confirmPassword, "is-invalid");
 
-                        }
-                        if (confirmPassword.classList.contains("is-invalid")) {
-                            confirmPassword.classList.remove("is-invalid");
-
-                        }
                         password.setCustomValidity("");
                         confirmPassword.setCustomValidity("");
                     }
@@ -263,8 +256,6 @@ HELLO;
 
                     form.classList.add('was-validated')
                 }, false)
-
-
 
                 <?php
                 if (isset($duplicateEmail) && $duplicateEmail) {

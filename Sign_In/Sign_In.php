@@ -13,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = !empty($_POST['email']) ? $_POST['email'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
 
-
         $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
         $validEmail = false;
         if (!empty($email) && preg_match($regExp, $email)) {
@@ -30,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($validData) {
             $validCredentials = processLogin($email, $password);
         }
-        consoleLog($validCredentials  ? "true" : "false");
+
         if ($validCredentials) {
             setSession($email);
             echo "<script>alert('Success, Redirecting to Home Page');</script>";
@@ -66,32 +65,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h1 class="">Sign In</h1>
 
             <div class="form-floating">
-
-                <input name="email" type="email" class="form-control 
-                <?php if (isset($validEmail)) {
-                    if (!$validEmail) {
-                        echo " is-invalid";
-                    }
-                }
-                ?>" id="floatingEmail" placeholder="name@example.com" value="<?php if (isset($email)) echo $email; ?>" required>
+                <input name="email" type="email" class="form-control <?php if (isset($validEmail) && !$validEmail) echo "is-invalid"; ?>" id="floatingEmail" placeholder="name@example.com" value="<?php if (isset($email)) echo $email; ?>" required>
                 <label for="floatingEmail">Email address</label>
-
-                <div class="invalid-feedback">
-                    Please enter a valid email
-                </div>
             </div>
             <div class="form-floating">
-                <input name="password" type="password" class="form-control 
-                <?php if ($emptyPassword) {
-                    echo " is-invalid";
-                }
-                ?>" id="floatingPassword" placeholder="Password" required>
+                <input name="password" type="password" class="form-control <?php if ($emptyPassword) echo "is-invalid"; ?>" id="floatingPassword" placeholder="Password" required>
 
                 <label for="floatingPassword">Password</label>
-                <div class="invalid-feedback">
-                    Password Cannot Be Empty
-                </div>
             </div>
+            <?php
+            if (isset($validCredentials) && !$validCredentials) {
+                echo <<<HELLO
+                <div class="mb-3 text-danger">
+                    Wrong Email or Password
+                </div>
+HELLO;
+            }
+            ?>
 
             <div class="checkbox mb-3">
                 <label class="">

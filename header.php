@@ -21,9 +21,7 @@ require_once dirname(__FILE__) . "/env_variables.php";
                 <input type="search" class="form-control form-control-primary form-control-dark" placeholder="Search...">
             </form>
 
-
             <?php
-
 
             if ($isLogin) {
                 echo <<<HELLO
@@ -52,8 +50,6 @@ HELLO;
 HELLO;
             }
             ?>
-
-
         </div>
     </div>
 </header>
