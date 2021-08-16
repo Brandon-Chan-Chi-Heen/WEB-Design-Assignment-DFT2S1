@@ -21,7 +21,9 @@
             <a href="" class="uploadButton">Upload</a>  -->
             <br><br>
             <?php echo getEventDetails(); ?>
+            
+            
         </section>
-        <?php include "../footer.html" ?>
+        <?php include "../footer.php" ?>
     </body>
 </html>
