@@ -42,13 +42,26 @@ HELLO;
         $result->free();
         $con->close();
     }
+    
+    
+}
     function bookmarkEvent(){
         
     }
     function addToCartFunction() {
         
     }
-
-}
-
+    function bookmarkList(){
+        $bookmark_List = <<< HELLO
+        <table>
+            <tr>
+                <td>Bla Bla Bla</td>
+            </tr>
+            <tr>
+                <td>Bla Bla Bla</td>
+            </tr>
+        </table>
+HELLO;
+        echo $bookmark_List;
+    } 
 ?>
