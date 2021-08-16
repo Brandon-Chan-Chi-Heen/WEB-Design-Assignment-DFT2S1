@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 15, 2021 at 01:54 PM
+-- Generation Time: Aug 16, 2021 at 09:42 AM
 -- Server version: 10.4.19-MariaDB
 -- PHP Version: 7.3.28
 
@@ -20,6 +20,30 @@ SET time_zone = "+00:00";
 --
 -- Database: `assignment`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bookmarks`
+--
+
+CREATE TABLE `bookmarks` (
+  `user_id` int(11) NOT NULL,
+  `Event_Title` varchar(30) NOT NULL,
+  `quantity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
+CREATE TABLE `cart` (
+  `user_id` int(11) NOT NULL,
+  `Event_Title` varchar(30) NOT NULL,
+  `quantity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -52,7 +76,7 @@ INSERT INTO `display_event` (`Event_Title`, `Event_Description`, `Event_Price`) 
 
 CREATE TABLE `participants` (
   `user_id` int(8) NOT NULL,
-  `Event_Title` varchar(30) NOT NULL,
+  `Event_Title_FK` varchar(30) NOT NULL,
   `gender` varchar(1) NOT NULL,
   `first_name` text NOT NULL,
   `last_name` text NOT NULL
@@ -62,11 +86,11 @@ CREATE TABLE `participants` (
 -- Dumping data for table `participants`
 --
 
-INSERT INTO `participants` (`user_id`, `Event_Title`, `gender`, `first_name`, `last_name`) VALUES
+INSERT INTO `participants` (`user_id`, `Event_Title_FK`, `gender`, `first_name`, `last_name`) VALUES
 (1, '3 Wealth Creation Strategies', 'M', 'B', 'C'),
+(1, 'Employee Investor Program', 'M', 'B', 'C'),
 (1, 'Financial Leteracy Workshop', 'M', 'B', 'C'),
 (1, 'Investing Note Trading Cup', 'M', 'B', 'C'),
-(1, 'Employee Investor Program', 'M', 'B', 'C'),
 (1, 'Power Up Your FQ', 'M', 'B', 'C');
 
 -- --------------------------------------------------------
@@ -89,13 +113,25 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `email`, `first_name`, `last_name`, `password`, `gender`) VALUES
-(1, 'brandoncch-wm20@student.tarc.edu.my', 'Brandon', 'Chan Chi Heen', '111', ''),
-(2, 'heenbrandon@yahoo.com', 'Brandon', 'Chan Chi Heen', '1234', ''),
-(3, 'heenbrandon@gmail.com', 'Brandon', 'Chan Chi Heen', '1234', '');
+(1, 'brandoncch-wm20@student.tarc.edu.my', 'Brandon', 'Chan Chi Heen', '111', '');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `bookmarks`
+--
+ALTER TABLE `bookmarks`
+  ADD PRIMARY KEY (`user_id`),
+  ADD KEY `eventTitle` (`Event_Title`);
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`user_id`),
+  ADD KEY `eventTitleCart` (`Event_Title`);
 
 --
 -- Indexes for table `display_event`
@@ -107,7 +143,8 @@ ALTER TABLE `display_event`
 -- Indexes for table `participants`
 --
 ALTER TABLE `participants`
-  ADD KEY `Event_Title` (`Event_Title`);
+  ADD KEY `UserId` (`user_id`),
+  ADD KEY `eventTitleParticipant` (`Event_Title_FK`);
 
 --
 -- Indexes for table `user`
@@ -125,17 +162,32 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `bookmarks`
+--
+ALTER TABLE `bookmarks`
+  ADD CONSTRAINT `bookmarks_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  ADD CONSTRAINT `eventTitle` FOREIGN KEY (`Event_Title`) REFERENCES `display_event` (`Event_Title`);
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cartUser` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  ADD CONSTRAINT `eventTitleCart` FOREIGN KEY (`Event_Title`) REFERENCES `display_event` (`Event_Title`);
+
+--
 -- Constraints for table `participants`
 --
 ALTER TABLE `participants`
-  ADD CONSTRAINT `Event_Title` FOREIGN KEY (`Event_Title`) REFERENCES `display_event` (`Event_Title`);
+  ADD CONSTRAINT `UserId` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  ADD CONSTRAINT `eventTitleParticipant` FOREIGN KEY (`Event_Title_FK`) REFERENCES `display_event` (`Event_Title`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
