@@ -190,28 +190,6 @@ ALTER TABLE `participants`
   ADD CONSTRAINT `eventTitleParticipant` FOREIGN KEY (`Event_Title_FK`) REFERENCES `display_event` (`Event_Title`);
 COMMIT;
 
--- Table structure for table `Event_cart`
---
-
-CREATE TABLE `Event_cart` (
-  `Event_Name varchar(30) NOT NULL,
-  `Quantity` int(11) NOT NULL,
-  `Price` float NOT NULL,
-  'Time' varchar(10) NOT NULL,
-  'Total Price' int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
-
-CREATE TABLE `Bookmarked-event` (
-  `Event_Name varchar(30) NOT NULL,
-  `Quantity` int(11) NOT NULL,
-  `Price` float NOT NULL,
-  'Time' varchar(10) NOT NULL,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
