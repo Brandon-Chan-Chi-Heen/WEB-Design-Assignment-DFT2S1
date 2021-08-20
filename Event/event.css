@@ -87,7 +87,7 @@ div.price{
     float: inline-end;
 }
 
-img {
+img.picture {
     display:block;
     width:100%;
     min-height: 391px;

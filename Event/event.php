@@ -1,5 +1,5 @@
-<?php   session_start(); 
-print_r($_SESSION);
+<?php  
+session_start();
 $isLogin = !empty($_SESSION['userID']) ? true : false;
 ?>
 
@@ -19,12 +19,8 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
         <?php include "../header.php" ?>
         <?php include "event_helper.php" ?>
         <section class="bodyDetails">
-            <h1>Event List</h1>
-            <br><br>
-            <?php echo getEventDetails();             
-            echo $_SESSION["userID"];
-            ?>
-
+            <h1>Event List</h1><br><br>
+            <?php echo getEventDetails(); ?>
         </section>
         <?php include "../footer.php" ?>
     </body>

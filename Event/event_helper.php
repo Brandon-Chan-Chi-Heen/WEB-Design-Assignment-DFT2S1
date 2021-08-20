@@ -1,5 +1,4 @@
 <?php
-session_start();
 //                                    <form action="Bookmark_Page.php" method="get">
 //                                        <button onclick = "bookmarkEvent($row->Event_Title)" class="addBookmarkButton">🔖</button>
 //                                    </form>
@@ -18,7 +17,7 @@ function getEventDetails() {
             $event_List = <<< HELLO
                 <div class="Event">
                     <div  class="col-1-3 specials">
-                    <img src="eventNo$pictureNumber.jpg" alt="" />
+                    <img src="eventNo$pictureNumber.jpg" alt="$row->Event_Title Picture" class="picture"/>
                     </div>
                     <div class="col-2-3 specials">
                         <div class="Details">
