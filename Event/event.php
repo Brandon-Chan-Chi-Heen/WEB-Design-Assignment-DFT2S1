@@ -1,3 +1,8 @@
+<?php   session_start(); 
+print_r($_SESSION);
+$isLogin = !empty($_SESSION['userID']) ? true : false;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -11,18 +16,15 @@
         <link href="event.css" type="text/css" rel="stylesheet">
     </head>
     <body class="bg-dark text-white">
-        <?php $isLogin = false; ?>
         <?php include "../header.php" ?>
         <?php include "event_helper.php" ?>
         <section class="bodyDetails">
             <h1>Event List</h1>
-<!--        <a href="" class="delete">Delete</a>
-            <a href="" class="editButton">Edit</a>
-            <a href="" class="uploadButton">Upload</a>  -->
             <br><br>
-            <?php echo getEventDetails(); ?>
-            
-            
+            <?php echo getEventDetails();             
+            echo $_SESSION["userID"];
+            ?>
+
         </section>
         <?php include "../footer.php" ?>
     </body>

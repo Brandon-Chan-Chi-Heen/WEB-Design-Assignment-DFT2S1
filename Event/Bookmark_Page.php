@@ -15,7 +15,14 @@
         <section class="bodyDetails">
         <h1>Bookmarked Event List</h1>
         <?php 
-            echo bookmarkList(); 
+            
+            $Event_Title = $_GET['Event_Title'];
+            echo bookmarkList($Event_Title); 
+            if(!isset($_SESSION['bookmarks'])){
+                $bookmarksArr = array();
+                $_SESSION['bookmarks'] = $bookmarkArr;
+            }
+            array_push($_SESSION['bookmarks'],$Event_Title);
         ?>
         </section>
         <?php include "../footer.php" ?>
