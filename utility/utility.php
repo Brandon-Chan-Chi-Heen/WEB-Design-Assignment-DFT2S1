@@ -77,8 +77,8 @@ function processLogin($email, $password)
 class Database
 {
     private const DB_HOST = 'localhost';
-    private const DB_PASSWORD = 'assignment';
-    private const DB_USER = 'Assignment';
+    private const DB_PASSWORD = '';
+    private const DB_USER = 'root';
     private const DB_NAME = 'assignment';
 
     public $con;

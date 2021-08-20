@@ -1,5 +1,7 @@
 <?php
-
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 // sevRoot is the extra path from htdocs
 // sevRoot used for href links
 
@@ -11,6 +13,8 @@
 // ex: project in C:\xampp\htdocs\assignment\
 // sevRoot = "\assignment"
 // docRoot = "C:\xampp\htdocs" . "\assignment" = "C:\xampp\htdocs\assignment"
-$sevRoot = "/assignment";
+$sevRoot = "/WEB-Design-Assignment-DFT2S1-main";
 $docRoot = $_SERVER["DOCUMENT_ROOT"] . $sevRoot;
-$isLogin = false;
+if (!isset($isLogin) || empty($isLogin)) {
+    $isLogin = !empty($_SESSION['userID']) ? true : false;
+}
