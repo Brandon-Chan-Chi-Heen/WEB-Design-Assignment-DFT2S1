@@ -15,20 +15,27 @@ function consoleLog(...$args)
     echo $echoedString;
 }
 
+function pretty($arr)
+{
+    echo '<pre>';
+    print_r($arr);
+    echo '</pre>';
+}
+
 // login utilities
 // sets session based on user email
 function setSession($email)
 {
     $db = new Database();
-    $userName = $db->getFullNameWithEmail($email);
-    $_SESSION["fullName"] =  $userName;
+    $userID = $db->getIdFromEmail($email);
+    $_SESSION["userID"] =  $userID;
     $db->disconnect();
 };
 
 // stop user session
 function unSetSession()
 {
-    $_SESSION["fullName"] =  '';
+    $_SESSION["userID"] =  '';
     session_destroy();
 }
 
@@ -74,7 +81,7 @@ class Database
     private const DB_USER = 'Assignment';
     private const DB_NAME = 'assignment';
 
-    private $con;
+    public $con;
     public $queryResult;
 
     private const tableColNames = array(
@@ -83,7 +90,8 @@ class Database
             "email",
             "first_name",
             "last_name",
-            "password"
+            "password",
+            "gender"
         ),
         "display_event" => array(
             "Event_Title",
@@ -95,7 +103,7 @@ class Database
             "last_name",
             "first_name",
             "gender",
-            "Event_Title"
+            "Event_Title_FK"
         )
     );
 
@@ -110,7 +118,7 @@ class Database
 
     function disconnect()
     {
-        if (!is_null($this->queryResult)) {
+        if (!is_null($this->queryResult) && !is_bool($this->queryResult)) {
             mysqli_free_result($this->queryResult);
         }
         mysqli_close($this->con);
@@ -135,6 +143,9 @@ class Database
         }
 
         $this->queryResult = mysqli_query($this->con, $queryStatement);
+        if (!$this->queryResult) {
+            consoleLog("No Results Found for query : ", $queryStatement);
+        }
 
         return mysqli_fetch_all($this->queryResult);
     }
@@ -174,10 +185,32 @@ class Database
         consoleLog($this->queryResult);
     }
 
+    function update($columnArray, $values, $whereStatement, $table = 'user')
+    {
+        if (array_intersect($columnArray, self::tableColNames[$table]) != $columnArray) {
+            consoleLog("Invalid column name");
+            return null;
+        }
+
+        $queryStatement = "UPDATE $table SET ";
+
+        for ($i = 0; $i < count($columnArray); $i++) {
+            $queryStatement .= "{$columnArray[$i]} = '{$values[$i]}', ";
+        }
+        $queryStatement = rtrim($queryStatement, ", ");
+
+        $queryStatement .= " WHERE $whereStatement;";
+        $this->queryResult = mysqli_query($this->con, $queryStatement);
+        if ($this->queryResult) {
+            return true;
+        }
+        return false;
+    }
+
     function getIdfromEmail($email)
     {
         $whereStatement = "email = '$email'";
-        return $this->select(array("email"), $whereStatement);
+        return $this->select(array("user_id"), $whereStatement)[0][0];
     }
 
     function loginPasswordEmail($email, $passwordHash)

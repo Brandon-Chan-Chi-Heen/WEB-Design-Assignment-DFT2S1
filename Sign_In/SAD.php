@@ -6,80 +6,80 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
 
 // post request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST)) {
-        $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
-        $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        $password = isset($_POST['password']) ? $_POST['password'] : '';
-        $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
+    // if (isset($_POST)) {
+    //     $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
+    //     $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
+    //     $email = isset($_POST['email']) ? $_POST['email'] : '';
+    //     $password = isset($_POST['password']) ? $_POST['password'] : '';
+    //     $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
 
-        $regExp = "/^[a-zA-Z\s]*$/";
-        $validFirstName = false;
-        $validLastName = false;
+    //     $regExp = "/^[a-zA-Z\s]*$/";
+    //     $validFirstName = false;
+    //     $validLastName = false;
 
-        if (!empty($firstName) && preg_match($regExp, $firstName)) {
-            $validFirstName = true;
-        }
+    //     if (!empty($firstName) && preg_match($regExp, $firstName)) {
+    //         $validFirstName = true;
+    //     }
 
-        if (!empty($lastName) && preg_match($regExp, $lastName)) {
-            $validLastName = true;
-        }
+    //     if (!empty($lastName) && preg_match($regExp, $lastName)) {
+    //         $validLastName = true;
+    //     }
 
-        $validNames = $validFirstName && $validLastName;
+    //     $validNames = $validFirstName && $validLastName;
 
-        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
-        $validEmail = false;
-        if (!empty($email) && preg_match($regExp, $email)) {
-            $validEmail = true;
-        }
+    //     $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
+    //     $validEmail = false;
+    //     if (!empty($email) && preg_match($regExp, $email)) {
+    //         $validEmail = true;
+    //     }
 
-        $validPassword = false;
-        $emptyPassword = true;
-        if (!empty($password) && !empty($confirmPassword)) {
-            $emptyPassword = false;
-        }
-        if ($password == $confirmPassword) {
-            $validPassword = !$emptyPassword && true;
-        }
+    //     $validPassword = false;
+    //     $emptyPassword = true;
+    //     if (!empty($password) && !empty($confirmPassword)) {
+    //         $emptyPassword = false;
+    //     }
+    //     if ($password == $confirmPassword) {
+    //         $validPassword = !$emptyPassword && true;
+    //     }
 
-        $validData = $validPassword && $validEmail && $validNames;
+    //     $validData = $validPassword && $validEmail && $validNames;
 
-        // attempt to register
-        // error upon same email
+    //     // attempt to register
+    //     // error upon same email
 
-        // variables for error handling
-        $duplicateEmail = false;
-        $registerSuccess = false;
-        if ($validData) {
-            try {
-                registerUser($firstName, $lastName, $email, $password);
-                $registerSuccess = true;
-            } catch (Exception $e) {
-                // email exists or existing user
-                consoleLog("Error occured");
-                switch ($e->getCode()) {
-                    case 1062:
-                        $duplicateEmail = true;
-                        consoleLog($duplicateEmail ? "true" : "false");
-                        $registerSuccess = false;
-                        consoleLog($e->getMessage());
-                        break;
-                    default:
-                        consoleLog("unknown mysqli Error have occured");
-                }
-            }
-        }
+    //     // variables for error handling
+    //     $duplicateEmail = false;
+    //     $registerSuccess = false;
+    //     if ($validData) {
+    //         try {
+    //             registerUser($firstName, $lastName, $email, $password);
+    //             $registerSuccess = true;
+    //         } catch (Exception $e) {
+    //             // email exists or existing user
+    //             consoleLog("Error occured");
+    //             switch ($e->getCode()) {
+    //                 case 1062:
+    //                     $duplicateEmail = true;
+    //                     consoleLog($duplicateEmail ? "true" : "false");
+    //                     $registerSuccess = false;
+    //                     consoleLog($e->getMessage());
+    //                     break;
+    //                 default:
+    //                     consoleLog("unknown mysqli Error have occured");
+    //             }
+    //         }
+    //     }
 
-        $validCredentials = false;
-        if ($registerSuccess) {
-            $validCredentials = processLogin($email, $password);
-        }
+    //     $validCredentials = false;
+    //     if ($registerSuccess) {
+    //         $validCredentials = processLogin($email, $password);
+    //     }
 
-        if ($validCredentials) {
-            setSession($email);
-            header("location: $sevRoot/index.php");
-        }
-    }
+    //     if ($validCredentials) {
+    //         setSession($email);
+    //         header("location: $sevRoot/index.php");
+    //     }
+    // }
 }
 
 ?>
@@ -106,8 +106,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include "$docRoot/header.php" ?>
 
     <div class="form-sign-up container bg-white">
-        <form class="row g-3 needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
-            <h1 class="">Sign Up</h1>
+        <form class="row g-3 needs-validation" action="" method="POST" novalidate>
+            <h1 class="">Membership Registration</h1>
 
             <div class="col-md-6 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
@@ -131,7 +131,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-12 mb-3 email-div">
+            <div class="col-md-6 mb-3">
+                <label for="phoneNumberInput" class="form-label">Phone Number</label>
+                <input name="telephone" type="tel" class="form-control" id="phoneNumberInput" pattern="[0-9]{3}-[0-9]{7,8}" value="<?php if (isset($lastName)) echo $lastName; ?>" placeholder="012-1231234" required>
+                <div class="invalid-feedback">
+                    Please enter a valid Last Name
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="<?php
                                                         echo "form-control ";
@@ -155,6 +166,46 @@ HTML;
                 }
                 ?>
             </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="phoneNumberInput" class="form-label">Age</label>
+                <input name="telephone" type="number" min="1" max="100" class="form-control" id="TelephoneInput" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" value="<?php if (isset($lastName)) echo $lastName; ?>" placeholder="1 ... 100" required>
+                <div class="invalid-feedback">
+                    Please enter a valid Age
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="phoneNumberInput" class="form-label">Gender</label>
+                <select class="form-select is-invalid" aria-label="Default select example">
+                    <option selected>Select Gender</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select your Gender
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="phoneNumberInput" class="form-label">IC NO</label>
+                <input name="telephone" type="text" class="form-control" id="phoneNumberInput" pattern="^[0-9]{6}-[0-9]{2}-[0-9]{4}$" value="<?php if (isset($lastName)) echo $lastName; ?>" placeholder="010203-04-0102" required>
+                <div class="invalid-feedback">
+                    Please enter a valid Last Name
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+
+
             <div class="col-md-6 mb-3">
                 <label for="passwordInput">Password</label>
                 <input name="password" type="password" class="form-control m-0 " id="passwordInput" placeholder="Password" required>
@@ -182,6 +233,7 @@ HTML;
             </div>
             <div class="col-12">
                 <button class="btn btn-primary" type="submit">Register</button>
+                <button class="btn btn-primary" type="submit">Cancel</button>
             </div>
         </form>
 
@@ -209,8 +261,13 @@ HTML;
                 let diffPassDisplay = document.getElementById('diffPass');
                 let email = document.getElementById('emailInput');
 
+                let select = document.querySelector('.form-select');
+                select.setCustomValidity("Invalid Field");
+
                 console.log(form);
                 form.addEventListener('submit', function(event) {
+                    event.preventDefault()
+                    event.stopPropagation()
                     // password stuffs
                     if (password.value === "" || confirmPassword.value === "" || password.value != confirmPassword.value) {
                         password.setCustomValidity("Invalid Field");

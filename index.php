@@ -2,10 +2,8 @@
 session_start();
 require_once dirname(__FILE__) . "/env_variables.php";
 
-$isLogin = !empty($_SESSION['fullName']) ? true : false;
+$isLogin = !empty($_SESSION['userID']) ? true : false;
 
-
-//
 if (isset($_SESSION)) {
 }
 ?>
@@ -92,7 +90,7 @@ if (isset($_SESSION)) {
                     }
 
                     for ($i = 0; $i < $numberOfItems; $i++) {
-                        echo <<<HELLO
+                        echo <<<HTML
                         <div class="col">
                             <div class="card shadow-sm">
                                 <img src="resources/Investhink.jpg" alt="event" />
@@ -112,7 +110,7 @@ if (isset($_SESSION)) {
                                 </div>
                             </div>
                         </div>
-HELLO;
+HTML;
                     }
                     ?>
                 </div>

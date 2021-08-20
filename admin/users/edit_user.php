@@ -1,25 +1,24 @@
 <?php
 session_start();
-require_once dirname(__FILE__) . "/../env_variables.php";
-require_once "$docRoot/utility/utility.php";
-$isLogin = !empty($_SESSION['userID']) ? true : false;
+require_once dirname(__FILE__) . "/../../env_variables.php";
+include "$docRoot/utility/utility.php";
 
-$firstName = '';
-$lastName = '';
-$email = '';
-if (!$isLogin) {
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['user_id'])) {
+    $_SESSION["cur_edit_id"] = $_GET['user_id'];
+} else if (empty($_SESSION['cur_edit_id'])) {
     echo <<<JAVASCRIPT
                 <script>
-                    alert('You are not logged in, Please Log in First'); 
-                    window.location='$sevRoot/index.php'
+                    alert(`No record selected, Please select first.
+                         Enter To Continue`); 
+                    window.location='list_user.php';
                 </script>
 JAVASCRIPT;
     die();
-} else {
-    $db = new Database();
-    $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['userID']}", 'user')[0];
-    [$firstName, $lastName, $email] = $result;
 }
+
+$db = new Database();
+$result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+[$firstName, $lastName, $email] = $result;
 
 function validationCheck($changeArray, $colName)
 {
@@ -56,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ));
         $changeArray["password"]["empty_pass"] = true;
         $changeArray["password"]["same_pass"] = false;
-
 
         $firstName = !empty($_POST['firstName']) ? $_POST['firstName'] : '';
         $lastName = !empty($_POST['lastName']) ? $_POST['lastName'] : '';
@@ -100,20 +98,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $db = new Database();
-        $whereStatement = "user_id = {$_SESSION["userID"]}";
+        $whereStatement = "user_id = {$_SESSION['cur_edit_id']}";
 
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
                 $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'user');
             }
         }
-        $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['userID']}", 'user')[0];
+        $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
         [$firstName, $lastName, $email] = $result;
         $db->disconnect();
     }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -126,19 +125,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-    <link href="profile.css" rel="stylesheet" />
+    <link href="../index.css" type="text/css" rel="stylesheet">
+    <link href="user.css" type="text/css" rel="stylesheet">
 </head>
 
-<body class="bg-dark text-center">
-    <?php include "$docRoot/header.php" ?>
+<body class="bg-dark">
+    <?php
+    include_once "../sidebar.php";
+    ?>
 
-    <div class="form-sign-up container bg-white">
-        <img src="<?php echo "$sevRoot/resources/user_icon.png" ?>" alt="user" class="rounded-circle">
-        <form class="row g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
-            <div class="col-md-6 mb-3">
+    <section class="text-white">
+
+        <h1>Edit User</h1>
+
+        <form class="g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
+            <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_id"])) echo $_SESSION["cur_edit_id"]; ?>">
+            <div class="col-md-4 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
-                <input name="firstName" type="text" class="form-control" id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
+                <input name="firstName" type="text" class="form-control " id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
                 <div class="invalid-feedback">
                     Please Enter a valid First name
                 </div>
@@ -147,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
                 <label for="lastNameInput" class="form-label">Last Name</label>
                 <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" placeholder="<?php if (isset($lastName)) echo $lastName; ?>" required>
                 <div class="invalid-feedback">
@@ -158,17 +162,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-12 mb-3 email-div">
+            <div class="col-md-6 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" placeholder="<?php if (isset($email)) echo $email; ?>" required>
                 <?php
                 if (isset($changeArray)) {
                     if ($changeArray["email"]["change_status"]) {
-                        // check if value is empty, if its empty it failed the validation check
-                        // heck if it succesfully updated the database
                         echo '<div class="invalid-feedback">';
 
+                        // check if value is empty, if its empty it failed the validation check
                         if (!empty($changeArray["email"]["value"])) {
+
+                            // check if it succesfully updated the database
                             if (!$changeArray["email"]["updated_status"]) {
                                 echo 'Email Exists in Database, Please Choose Another Email';
                             }
@@ -186,8 +191,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     Changed!
                 </div>
             </div>
-            <div class="col-md-12 row g-0 mb-3 pt-3">
-                <div class="col-md-6 mb-3 px-2">
+            <div class="col-md-8 row g-0 mb-3 pt-3">
+                <div class="col-md-6 mb-3 ">
                     <label for="passwordInput">Password</label>
                     <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" required>
                 </div>
@@ -198,9 +203,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php
                 if (isset($changeArray)) {
                     if ($changeArray["password"]["change_status"]) {
-                        echo '<div class="invalid-feedback col-md-12 px-2">';
+                        echo '<div class="invalid-feedback col-md-12 px-2 text-center">';
                         // check if value is empty, if its empty it failed the validation check
-                        // heck if it succesfully updated the database
+                        // check if it succesfully updated the database
                         if ($changeArray["password"]["empty_pass"]) {
                             echo 'Password Cannot Be Empty';
                         } else if (!$changeArray["password"]["same_pass"]) {
@@ -213,35 +218,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
                 ?>
 
-                <div class="valid-feedback col-md-12  px-2">
+                <div class="valid-feedback col-md-12 px-2  text-center">
                     Changed!
                 </div>
             </div>
 
             <div class="col-12">
                 <button class="btn btn-primary" type="submit">Save</button>
+                <a class="btn btn-primary" href="list_user.php">Return</a>
             </div>
         </form>
-    </div>
 
-    <script>
-        <?php
-        $idList = array("firstNameInput", "lastNameInput", "emailInput", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
-        $fieldNameList = array("first_name", "last_name", "email", "password", "password", "password");
-        if (isset($changeArray)) {
-            for ($i = 0; $i < count($idList); $i++) {
-                if (!is_null(validationCheck($changeArray, $fieldNameList[$i]))) {
-                    if (validationCheck($changeArray, $fieldNameList[$i])) {
-                        echo "document.querySelector('#{$idList[$i]}').classList.add('is-valid');\n";
-                    } else {
-                        echo "document.querySelector('#{$idList[$i]}').classList.add('is-invalid');\n";
+        </div>
+
+        <script>
+            <?php
+            $idList = array("firstNameInput", "lastNameInput", "emailInput", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
+            $fieldNameList = array("first_name", "last_name", "email", "password", "password", "password");
+            if (isset($changeArray)) {
+                for ($i = 0; $i < count($idList); $i++) {
+                    if (!is_null(validationCheck($changeArray, $fieldNameList[$i]))) {
+                        if (validationCheck($changeArray, $fieldNameList[$i])) {
+                            echo "document.querySelector('#{$idList[$i]}').classList.add('is-valid');\n";
+                        } else {
+                            echo "document.querySelector('#{$idList[$i]}').classList.add('is-invalid');\n";
+                        }
                     }
                 }
             }
-        }
-        ?>
-    </script>
-    <?php include "$docRoot/footer.php" ?>
+            ?>
+        </script>
+
+
+    </section>
 </body>
 
 </html>

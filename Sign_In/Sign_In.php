@@ -32,8 +32,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($validCredentials) {
             setSession($email);
-            echo "<script>alert('Success, Redirecting to Home Page');</script>";
-            header("location: $sevRoot/index.php");
+            echo <<<JAVASCRIPT
+                <script>
+                    alert('Success, Redirecting to Home Page'); 
+                    window.location='$sevRoot/index.php'
+                </script>
+JAVASCRIPT;
+            die();
         }
     }
 }
@@ -61,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="form-signin container bg-white">
 
-        <form class="needs-validation" action="Sign_In.php" method="POST" novalidate>
+        <form class="needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
             <h1 class="">Sign In</h1>
 
             <div class="form-floating">
@@ -75,11 +80,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php
             if (isset($validCredentials) && !$validCredentials) {
-                echo <<<HELLO
+                echo <<<HTML
                 <div class="mb-3 text-danger">
                     Wrong Email or Password
                 </div>
-HELLO;
+HTML;
             }
             ?>
 

@@ -1,12 +1,12 @@
 <?php
 session_start();
-require_once dirname(__FILE__) . "/../env_variables.php";
-require_once "$docRoot/utility/utility.php";
-$isLogin = !empty($_SESSION['userID']) ? true : false;
+require_once dirname(__FILE__) . "/../../env_variables.php";
+include "$docRoot/utility/utility.php";
 
-// post request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
+        // data validation
+        // could change all variables to be part of an array, 
         $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
         $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
         $email = isset($_POST['email']) ? $_POST['email'] : '';
@@ -69,47 +69,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
-
-        $validCredentials = false;
-        if ($registerSuccess) {
-            $validCredentials = processLogin($email, $password);
-        }
-
-        if ($validCredentials) {
-            setSession($email);
-            header("location: $sevRoot/index.php");
-        }
     }
 }
-
 ?>
 
-<!doctype html>
+
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>Sign In</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-    <link href="Sign_Up.css" rel="stylesheet">
-
+    <link href="../index.css" type="text/css" rel="stylesheet">
+    <link href="user.css" type="text/css" rel="stylesheet">
 </head>
 
-<body class="bg-dark text-center">
-    <?php include "$docRoot/header.php" ?>
+<body class="bg-dark">
+    <?php
+    include_once "../sidebar.php";
+    ?>
 
-    <div class="form-sign-up container bg-white">
-        <form class="row g-3 needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
-            <h1 class="">Sign Up</h1>
+    <section class="text-white">
 
-            <div class="col-md-6 mb-3">
+        <h1>Add User</h1>
+
+        <form class="g-3 needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
+
+            <div class="col-md-3 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
                 <input name="firstName" type="text" class="form-control " id="firstNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($firstName)) echo $firstName; ?>" placeholder="John" required>
                 <div class="invalid-feedback">
@@ -120,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
                 <label for="lastNameInput" class="form-label">Last Name</label>
                 <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($lastName)) echo $lastName; ?>" placeholder="Doe" required>
                 <div class="invalid-feedback">
@@ -131,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-12 mb-3 email-div">
+            <div class="col-md-4 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="<?php
                                                         echo "form-control ";
@@ -155,33 +147,50 @@ HTML;
                 }
                 ?>
             </div>
-            <div class="col-md-6 mb-3">
-                <label for="passwordInput">Password</label>
-                <input name="password" type="password" class="form-control m-0 " id="passwordInput" placeholder="Password" required>
 
-                <div class="invalid-feedback" id="emptyPass">
-                    Password Cannot Be Empty
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="passwordInput">Password</label>
+                    <input name="password" type="password" class="form-control m-0 " id="passwordInput" placeholder="Password" required>
+
+                    <div class="invalid-feedback" id="emptyPass">
+                        Password Cannot Be Empty
+                    </div>
+
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="confirmPasswordInput">Confirm Password</label>
+                    <input name="confirmPassword" type="password" class="form-control " id="confirmPasswordInput" placeholder="Confirm Password" required>
+                    <div class="invalid-feedback" id="diffPass">
+                        Please enter the same password
+                    </div>
+
                 </div>
 
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="confirmPasswordInput">Confirm Password</label>
-                <input name="confirmPassword" type="password" class="form-control " id="confirmPasswordInput" placeholder="Confirm Password" required>
-                <div class="invalid-feedback" id="diffPass">
-                    Please enter the same password
-                </div>
 
             </div>
-            <div class="col-12">
-                <div class="form-check" style="text-align: left">
-                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck2" required>
-                    <label class="form-check-label" for="invalidCheck2">
-                        Agree to terms and conditions
-                    </label>
-                </div>
-            </div>
+
+            <?php
+            if (isset($registerSuccess) && $registerSuccess) {
+                echo <<<HTML
+                    <div class="col-md-5 text-success">
+                    <h1>
+                        Record Added
+                    </h1>
+                    </div>
+HTML;
+            }
+            ?>
+
             <div class="col-12">
                 <button class="btn btn-primary" type="submit">Register</button>
+                <?php
+                if (isset($registerSuccess) && $registerSuccess) {
+                    echo <<<HTML
+                        <a class="btn btn-primary" href="list_user.php">Return</a>
+HTML;
+                }
+                ?>
             </div>
         </form>
 
@@ -269,8 +278,9 @@ JAVASCRIPT;
                 ?>
             })()
         </script>
-    </div>
-    <br>
+        </div>
+        <br>
+    </section>
 </body>
 
 </html>

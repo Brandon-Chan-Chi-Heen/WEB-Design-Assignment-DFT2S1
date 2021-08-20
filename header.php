@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . "/env_variables.php";
             <?php
 
             if ($isLogin) {
-                echo <<<HELLO
+                echo <<<HTML
                 <div class="dropdown">
                     <a href="#" class="d-block text-white text-decoration-none dropdown-toggle dropdown-toggle-split" id="dropdownUser1" data-bs-toggle="dropdown" >
                         <!-- <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle mx-2"> -->
@@ -41,13 +41,13 @@ require_once dirname(__FILE__) . "/env_variables.php";
                         <li><a class="dropdown-item" href="$sevRoot/Sign_In/Sign_Out.php">Sign out</a></li>
                     </ul>
                 </div> 
-HELLO;
+HTML;
             } else {
-                echo <<<HELLO
+                echo <<<HTML
                 <div class="text-end">
                     <button type="button" class="btn btn-primary me-2" onclick="document.location='$sevRoot/Sign_In/Sign_In.php'">Login / Sign Up</button>
                 </div>
-HELLO;
+HTML;
             }
             ?>
         </div>
