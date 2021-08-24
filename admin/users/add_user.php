@@ -2,6 +2,9 @@
 session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
+include "$docRoot/admin/redirectNonAdmin.php";
+
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
@@ -52,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $registerSuccess = false;
         if ($validData) {
             try {
-                registerUser($firstName, $lastName, $email, $password);
+                registerUser($firstName, $lastName, $email, $password, $gender);
                 $registerSuccess = true;
             } catch (Exception $e) {
                 // email exists or existing user
@@ -69,11 +72,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
+
+        if ($registerSuccess) {
+            $firstName = '';
+            $lastName = '';
+            $email = '';
+            $password =  '';
+            $confirmPassword = '';
+        }
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">

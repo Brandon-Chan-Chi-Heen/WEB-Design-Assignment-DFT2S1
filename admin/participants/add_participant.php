@@ -2,6 +2,9 @@
 session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
+include "$docRoot/admin/redirectNonAdmin.php";
+
+
 
 $firstName = '';
 $lastName = '';

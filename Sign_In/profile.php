@@ -17,8 +17,8 @@ JAVASCRIPT;
     die();
 } else {
     $db = new Database();
-    $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['userID']}", 'user')[0];
-    [$firstName, $lastName, $email] = $result;
+    $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['userID']}", 'user')[0];
+    [$firstName, $lastName, $email, $gender] = $result;
 }
 
 function validationCheck($changeArray, $colName)
@@ -47,22 +47,63 @@ function initChangeArray(&$changeArray, $colList)
         );
     }
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
+    $file = $_FILES['file'];
+    $fileErr = '';
 
+    if ($file['error'] > 0) {
+        switch ($file['error']) {
+            case UPLOAD_ERR_NO_FILE: // Code = 4.
+                // ignore and don't update
+                break;
+            case UPLOAD_ERR_FORM_SIZE: // Code = 2.
+                $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
+                break;
+            default: // Other codes.
+                $fileErr = 'There was an error while uploading the file.';
+                break;
+        }
+    } else if ($file['size'] > 1048576) {
+        // Check the file size. Prevent hacks.
+        // 1MB = 1024KB = 1048576B.
+        $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
+    } else {
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (
+            $ext != 'jpg'  &&
+            $ext != 'jpeg' &&
+            $ext != 'gif'  &&
+            $ext != 'png'
+        ) {
+            $fileErr = 'Only JPG, GIF and PNG format are allowed.';
+        } else {
+            $save_as = $_SESSION['userID'] . '.' . $ext;
+
+            // delete any existing img with the same name but different ext
+
+            $oldFile = glob("$docRoot/resources/{$_SESSION["userID"]}.*")[0];
+            unlink($oldFile);
+            move_uploaded_file($file['tmp_name'], "$docRoot/resources/" . $save_as);
+        }
+    }
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
         $changeArray = array();
         initChangeArray($changeArray, array(
-            "first_name", "last_name", "email", "password"
+            "first_name", "last_name", "email", "password", "gender"
         ));
         $changeArray["password"]["empty_pass"] = true;
         $changeArray["password"]["same_pass"] = false;
 
 
-        $firstName = !empty($_POST['firstName']) ? $_POST['firstName'] : '';
-        $lastName = !empty($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = !empty($_POST['email']) ? $_POST['email'] : '';
-        $password = !empty($_POST['password']) ? $_POST['password'] : '';
-        $confirmPassword = !empty($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
+        $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
+        $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
+        $email = isset($_POST['email']) ? $_POST['email'] : '';
+        $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
+        $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
 
         $regExp = "/^[a-zA-Z\s]*$/";
 
@@ -88,6 +129,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
+        if (!empty($gender)) {
+            $changeArray["gender"]["change_status"] = true;
+            if ($gender == "M" || $gender == "F" || $gender == "O") {
+                $changeArray["gender"]["value"] = $gender;
+            }
+        }
+
         //either password is empty, check failed
         if (!empty($password) || !empty($confirmPassword)) {
             $changeArray["password"]["change_status"] = true;
@@ -102,14 +150,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $db = new Database();
         $whereStatement = "user_id = {$_SESSION["userID"]}";
-
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
                 $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'user');
             }
         }
-        $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['userID']}", 'user')[0];
-        [$firstName, $lastName, $email] = $result;
+        $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['userID']}", 'user')[0];
+        [$firstName, $lastName, $email, $gender] = $result;
+
         $db->disconnect();
     }
 }
@@ -134,11 +182,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php include "$docRoot/header.php" ?>
 
     <div class="form-sign-up container bg-white">
-        <img src="<?php echo "$sevRoot/resources/user_icon.png" ?>" alt="user" class="rounded-circle">
-        <form class="row g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
+
+        <form class="row g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data" novalidate>
+            <img id="profileImgID" src="<?php echo "$sevRoot/utility/getImage.php?user_id={$_SESSION['userID']}"; ?>" style="object-fit:cover;" alt="user" class="rounded-circle g-0">
+
+            <input type="hidden" name="MAX_FILE_SIZE" value="1048576" />
+            <div class="rounded-circle g-0" id="fileInputDiv">
+                <label for="fileID" id="fileLabel">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white" class="bi bi-camera-fill" viewBox="0 0 16 16">
+                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                        <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z" />
+                    </svg><br>
+                    Upload Photo
+                </label>
+                <input type="file" name="file" id="fileID" accept=".gif, .jpg, .jpeg, .png" title=" " onchange="form.submit()" disabled />
+            </div>
             <div class="col-md-6 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
-                <input name="firstName" type="text" class="form-control" id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
+                <input name="firstName" type="text" class="form-control" id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" disabled required>
                 <div class="invalid-feedback">
                     Please Enter a valid First name
                 </div>
@@ -149,7 +210,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="col-md-6 mb-3">
                 <label for="lastNameInput" class="form-label">Last Name</label>
-                <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" placeholder="<?php if (isset($lastName)) echo $lastName; ?>" required>
+                <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" placeholder="<?php if (isset($lastName)) echo $lastName; ?>" disabled required>
                 <div class="invalid-feedback">
                     Please enter a valid Last Name
                 </div>
@@ -158,9 +219,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-12 mb-3 email-div">
+            <div class="col-md-9 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
-                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" placeholder="<?php if (isset($email)) echo $email; ?>" required>
+                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" placeholder="<?php if (isset($email)) echo $email; ?>" disabled required>
                 <?php
                 if (isset($changeArray)) {
                     if ($changeArray["email"]["change_status"]) {
@@ -180,20 +241,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
                 ?>
-
-
                 <div class="valid-feedback">
                     Changed!
                 </div>
             </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="genderSelect" class="form-label">Gender</label>
+                <select name="gender" id="genderSelect" class="form-select" disabled required>
+                    <option value="" <?php if (isset($gender)  && $gender == "") echo "selected"; ?> disabled hidden>Select Gender</option>
+                    <option <?php
+                            if (isset($gender)  && $gender == "M") {
+                                echo "value = '' selected";
+                            } else {
+                                echo "value = 'M'";
+                            }
+                            ?>>
+                        Male
+                    </option>
+                    <option <?php
+                            if (isset($gender)  && $gender == "F") {
+                                echo "value = '' selected";
+                            } else {
+                                echo "value = 'F'";
+                            }
+                            ?>>
+                        Female
+                    </option>
+                    <option <?php
+                            if (isset($gender)  && $gender == "O") {
+                                echo "value = '' selected";
+                            } else {
+                                echo "value = 'O'";
+                            }
+                            ?>>
+                        Other
+                    </option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select your gender
+                </div>
+                <div class="valid-feedback">
+                    Changed!
+                </div>
+            </div>
+
             <div class="col-md-12 row g-0 mb-3 pt-3">
                 <div class="col-md-6 mb-3 px-2">
                     <label for="passwordInput">Password</label>
-                    <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" required>
+                    <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" disabled required>
                 </div>
                 <div id="passwordErrorWrapper" class="col-md-6 mb-3 px-2">
                     <label for="confirmPasswordInput">Confirm Password</label>
-                    <input name="confirmPassword" type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
+                    <input name="confirmPassword" type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" disabled required>
                 </div>
                 <?php
                 if (isset($changeArray)) {
@@ -217,17 +317,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     Changed!
                 </div>
             </div>
+            <div>
+                <div class=""></div>
+                <!-- above class to trigger file errors -->
+                <div class="<?php if (empty($fileErr)) echo "d-none"; ?> text-danger">
+                    <?php
+                    if (!empty($fileErr)) {
+                        echo $fileErr;
+                    }
+                    ?>
+                </div>
+            </div>
+
 
             <div class="col-12">
-                <button class="btn btn-primary" type="submit">Save</button>
+                <button id="editButton" class="btn btn-primary" type="button" onclick="toggleFields();">Edit</button>
+                <button id="saveButton" class="btn btn-primary d-none" type="submit">Save</button>
             </div>
         </form>
     </div>
 
     <script>
         <?php
-        $idList = array("firstNameInput", "lastNameInput", "emailInput", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
-        $fieldNameList = array("first_name", "last_name", "email", "password", "password", "password");
+        $idList = array("firstNameInput", "lastNameInput", "emailInput", "genderSelect",  "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
+        $fieldNameList = array("first_name", "last_name", "email", "gender", "password", "password", "password");
         if (isset($changeArray)) {
             for ($i = 0; $i < count($idList); $i++) {
                 if (!is_null(validationCheck($changeArray, $fieldNameList[$i]))) {
@@ -240,6 +353,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         ?>
+
+        function toggleFields() {
+            let inputArr = document.querySelectorAll('input');
+            let selectArr = document.querySelectorAll('select');
+            for (let input of inputArr) {
+                input.disabled = !(input.disabled) ? true : false;
+            }
+            for (let select of selectArr) {
+                select.disabled = !(select.disabled) ? true : false;
+            }
+
+            let uploadDiv = document.querySelector('#fileInputDiv');
+
+            if (uploadDiv.classList.contains("fileInputDiv")) {
+                uploadDiv.classList.remove("fileInputDiv");
+            } else {
+                uploadDiv.classList.add("fileInputDiv");
+            }
+
+            let saveButton = document.querySelector('#saveButton');
+
+            if (saveButton.classList.contains("d-none")) {
+                saveButton.classList.remove("d-none");
+            } else {
+                saveButton.classList.add("d-none");
+            }
+        }
     </script>
     <?php include "$docRoot/footer.php" ?>
 </body>

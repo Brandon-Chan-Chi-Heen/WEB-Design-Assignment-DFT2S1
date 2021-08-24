@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . "/env_variables.php";
                 <div class="dropdown">
                     <a href="#" class="d-block text-white text-decoration-none dropdown-toggle dropdown-toggle-split" id="dropdownUser1" data-bs-toggle="dropdown" >
                         <!-- <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle mx-2"> -->
-                        <img src="$sevRoot/resources/user_icon.png" alt="user" width="32" height="32" class="rounded-circle mx-2">
+                        <img src="$sevRoot/utility/getImage.php?user_id={$_SESSION['userID']}" alt="user" style="width:32px;height:32px;object-fit:cover;" class="rounded-circle mx-2" >
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">Bookmarked Events</a></li>

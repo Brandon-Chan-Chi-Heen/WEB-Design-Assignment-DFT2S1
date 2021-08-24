@@ -2,6 +2,8 @@
 session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
+include "$docRoot/admin/redirectNonAdmin.php";
+
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['user_id'])) {
     $_SESSION["cur_edit_id"] = $_GET['user_id'];
@@ -17,8 +19,8 @@ JAVASCRIPT;
 }
 
 $db = new Database();
-$result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
-[$firstName, $lastName, $email] = $result;
+$result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+[$firstName, $lastName, $email, $gender] = $result;
 
 function validationCheck($changeArray, $colName)
 {
@@ -47,6 +49,47 @@ function initChangeArray(&$changeArray, $colList)
     }
 }
 
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
+    $file = $_FILES['file'];
+    $fileErr = '';
+
+    if ($file['error'] > 0) {
+        switch ($file['error']) {
+            case UPLOAD_ERR_NO_FILE: // Code = 4.
+                // ignore and don't update
+                break;
+            case UPLOAD_ERR_FORM_SIZE: // Code = 2.
+                $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
+                break;
+            default: // Other codes.
+                $fileErr = 'There was an error while uploading the file.';
+                break;
+        }
+    } else if ($file['size'] > 1048576) {
+        // Check the file size. Prevent hacks.
+        // 1MB = 1024KB = 1048576B.
+        $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
+    } else {
+        $ext = strtoupper(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (
+            $ext != 'JPG'  &&
+            $ext != 'JPEG' &&
+            $ext != 'GIF'  &&
+            $ext != 'PNG'
+        ) {
+            $fileErr = 'Only JPG, GIF and PNG format are allowed.';
+        } else {
+            $save_as = $_SESSION['cur_edit_id'] . '.' . $ext;
+
+            // delete any existing img with the same name but different ext
+
+            $oldFile = glob("$docRoot/resources/{$_SESSION["cur_edit_id"]}.*")[0];
+            unlink($oldFile);
+            move_uploaded_file($file['tmp_name'], "$docRoot/resources/" . $save_as);
+        }
+    }
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
         $changeArray = array();
@@ -56,11 +99,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $changeArray["password"]["empty_pass"] = true;
         $changeArray["password"]["same_pass"] = false;
 
-        $firstName = !empty($_POST['firstName']) ? $_POST['firstName'] : '';
-        $lastName = !empty($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = !empty($_POST['email']) ? $_POST['email'] : '';
-        $password = !empty($_POST['password']) ? $_POST['password'] : '';
-        $confirmPassword = !empty($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
+        $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
+        $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
+        $email = isset($_POST['email']) ? $_POST['email'] : '';
+        $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
+        $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
 
         $regExp = "/^[a-zA-Z\s]*$/";
 
@@ -86,6 +130,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
+        if (!empty($gender)) {
+            $changeArray["gender"]["change_status"] = true;
+            if ($gender == "M" || $gender == "F" || $gender == "O") {
+                $changeArray["gender"]["value"] = $gender;
+            }
+        }
+
         //either password is empty, check failed
         if (!empty($password) || !empty($confirmPassword)) {
             $changeArray["password"]["change_status"] = true;
@@ -105,8 +156,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'user');
             }
         }
-        $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
-        [$firstName, $lastName, $email] = $result;
+        $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+        [$firstName, $lastName, $email, $gender] = $result;
         $db->disconnect();
     }
 }
@@ -137,9 +188,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <section class="text-white">
 
         <h1>Edit User</h1>
+        <img src="<?php echo "$sevRoot/utility/getImage.php?user_id={$_SESSION["cur_edit_id"]}" ?>" height="200" width="200" style="object-fit:cover;" alt="">
 
-        <form class="g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
+        <form class="g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data" novalidate>
             <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_id"])) echo $_SESSION["cur_edit_id"]; ?>">
+            <div class="rounded-circle g-0 my-3" id="fileInputDiv">
+                <input type="file" class="<?php if (!empty($fileErr)) echo "is-invalid"; ?>" name="file" id="fileID" accept=".gif, .jpg, .jpeg, .png" />
+                <div class="invalid-feedback">
+                    <?php
+                    if (!empty($fileErr)) {
+                        echo $fileErr;
+                    }
+                    ?>
+                </div>
+            </div>
+
             <div class="col-md-4 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
                 <input name="firstName" type="text" class="form-control " id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
@@ -185,12 +248,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
                 ?>
-
-
                 <div class="valid-feedback">
                     Changed!
                 </div>
             </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="genderSelect" class="form-label">Gender</label>
+                <select name="gender" id="genderSelect" class="form-select" required>
+                    <option value="" <?php if (isset($gender)  && $gender == "") echo "selected"; ?> disabled hidden>Select Gender</option>
+                    <option <?php
+                            if (isset($gender)  && $gender == "M") {
+                                echo "value = '' selected";
+                            } else {
+                                echo "value = 'M'";
+                            }
+                            ?>>
+                        Male
+                    </option>
+                    <option <?php
+                            if (isset($gender)  && $gender == "F") {
+                                echo "value = '' selected";
+                            } else {
+                                echo "value = 'F'";
+                            }
+                            ?>>
+                        Female
+                    </option>
+                    <option <?php
+                            if (isset($gender)  && $gender == "O") {
+                                echo "value = '' selected";
+                            } else {
+                                echo "value = 'O'";
+                            }
+                            ?>>
+                        Other
+                    </option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select your gender
+                </div>
+                <div class="valid-feedback">
+                    Changed!
+                </div>
+            </div>
+
             <div class="col-md-8 row g-0 mb-3 pt-3">
                 <div class="col-md-6 mb-3 ">
                     <label for="passwordInput">Password</label>
@@ -233,8 +335,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <script>
             <?php
-            $idList = array("firstNameInput", "lastNameInput", "emailInput", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
-            $fieldNameList = array("first_name", "last_name", "email", "password", "password", "password");
+            $idList = array("firstNameInput", "lastNameInput", "emailInput", "genderSelect", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
+            $fieldNameList = array("first_name", "last_name", "email", "gender", "password", "password", "password");
             if (isset($changeArray)) {
                 for ($i = 0; $i < count($idList); $i++) {
                     if (!is_null(validationCheck($changeArray, $fieldNameList[$i]))) {

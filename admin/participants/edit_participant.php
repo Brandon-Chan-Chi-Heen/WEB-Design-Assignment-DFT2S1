@@ -2,6 +2,8 @@
 session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
+include "$docRoot/admin/redirectNonAdmin.php";
+
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['user_id'])) {
     $_SESSION["cur_edit_id"] = $_GET['user_id'];

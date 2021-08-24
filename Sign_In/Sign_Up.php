@@ -3,6 +3,9 @@ session_start();
 require_once dirname(__FILE__) . "/../env_variables.php";
 require_once "$docRoot/utility/utility.php";
 $isLogin = !empty($_SESSION['userID']) ? true : false;
+if ($isLogin) {
+    header("location: $sevRoot/index.php");
+}
 
 // post request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -11,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
         $email = isset($_POST['email']) ? $_POST['email'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
         $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
 
         $regExp = "/^[a-zA-Z\s]*$/";
@@ -33,16 +37,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validEmail = true;
         }
 
+        $validGender = false;
+        if ($gender == "M" || $gender == "F" || $gender == "O") {
+            $validGender = true;
+        }
+
         $validPassword = false;
         $emptyPassword = true;
         if (!empty($password) && !empty($confirmPassword)) {
             $emptyPassword = false;
         }
+
         if ($password == $confirmPassword) {
             $validPassword = !$emptyPassword && true;
         }
 
-        $validData = $validPassword && $validEmail && $validNames;
+        $validData = $validPassword && $validEmail && $validNames && $validGender;
 
         // attempt to register
         // error upon same email
@@ -52,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $registerSuccess = false;
         if ($validData) {
             try {
-                registerUser($firstName, $lastName, $email, $password);
+                registerUser($firstName, $lastName, $email, $password, $gender);
                 $registerSuccess = true;
             } catch (Exception $e) {
                 // email exists or existing user
@@ -131,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-12 mb-3 email-div">
+            <div class="col-md-7 mb-3 email-div">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="<?php
                                                         echo "form-control ";
@@ -155,6 +165,23 @@ HTML;
                 }
                 ?>
             </div>
+
+            <div class="col-md-5 mb-3">
+                <label for="genderSelect" class="form-label">Gender</label>
+                <select name="gender" id="genderSelect" class="form-select" required>
+                    <option value="" selected disabled hidden>Select Gender</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="O">Other</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select your gender
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
             <div class="col-md-6 mb-3">
                 <label for="passwordInput">Password</label>
                 <input name="password" type="password" class="form-control m-0 " id="passwordInput" placeholder="Password" required>
@@ -162,7 +189,6 @@ HTML;
                 <div class="invalid-feedback" id="emptyPass">
                     Password Cannot Be Empty
                 </div>
-
             </div>
             <div class="col-md-6 mb-3">
                 <label for="confirmPasswordInput">Confirm Password</label>
@@ -170,7 +196,6 @@ HTML;
                 <div class="invalid-feedback" id="diffPass">
                     Please enter the same password
                 </div>
-
             </div>
             <div class="col-12">
                 <div class="form-check" style="text-align: left">
@@ -181,6 +206,7 @@ HTML;
                 </div>
             </div>
             <div class="col-12">
+                <button class="btn btn-primary" type="button" onclick='window.location= "<?php echo "$sevRoot/Sign_In/Sign_In.php"; ?>"'>Back To Login</button>
                 <button class="btn btn-primary" type="submit">Register</button>
             </div>
         </form>

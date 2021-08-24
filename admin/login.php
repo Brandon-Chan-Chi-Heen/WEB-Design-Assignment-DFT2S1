@@ -2,24 +2,21 @@
 session_start();
 require_once dirname(__FILE__) . "/../env_variables.php";
 require_once "$docRoot/utility/utility.php";
+require_once "$docRoot/admin/admin_utility.php";
 
-$isLogin = !empty($_SESSION['userID']) ? true : false;
+$isLoginAdmin = !empty($_SESSION['adminID']) ? true : false;
 $emptyPassword = false;
-if ($isLogin) {
-    header("location: $sevRoot/index.php");
-}
 
 // post request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
-
-        $email = !empty($_POST['email']) ? $_POST['email'] : '';
+        $adminID = !empty($_POST['adminID']) ? $_POST['adminID'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
 
-        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
-        $validEmail = false;
-        if (!empty($email) && preg_match($regExp, $email)) {
-            $validEmail = true;
+        $regExp = "/^[a-zA-Z0-9]*$/";
+        $validAdminID = false;
+        if (!empty($adminID) && preg_match($regExp, $adminID)) {
+            $validAdminID = true;
         }
 
         $emptyPassword = true;
@@ -27,21 +24,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $emptyPassword = false;
         }
 
-        $validData = !$emptyPassword && $validEmail;
+        $validData = !$emptyPassword && $validAdminID;
         $validCredentials = false;
         if ($validData) {
-            $validCredentials = processLogin($email, $password);
+            $validCredentials = processAdminLogin($adminID, $password);
         }
 
         if ($validCredentials) {
-            setSession($email);
-            if (!empty($_SESSION["adminID"])) {
-                unset($_SESSION["adminID"]);
+            setAdminSession($adminID);
+            if (!empty($_SESSION["userID"])) {
+                unset($_SESSION["userID"]);
             }
             echo <<<JAVASCRIPT
                 <script>
                     alert('Success, Redirecting to Home Page'); 
-                    window.location='$sevRoot/index.php'
+                    window.location='$sevRoot/admin/index.php'
                 </script>
 JAVASCRIPT;
             die();
@@ -59,7 +56,7 @@ JAVASCRIPT;
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
-    <title>Sign In</title>
+    <title>Admin Panel</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -68,20 +65,18 @@ JAVASCRIPT;
 </head>
 
 <body class="bg-dark text-center">
-    <?php include "$docRoot/header.php" ?>
 
     <div class="form-signin container bg-white">
 
         <form class="needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
-            <h1 class="">Sign In</h1>
+            <h1 class="">Admin Panel</h1>
 
             <div class="form-floating">
-                <input name="email" type="email" class="form-control <?php if (isset($validEmail) && !$validEmail) echo "is-invalid"; ?>" id="floatingEmail" placeholder="name@example.com" value="<?php if (isset($email)) echo $email; ?>" required>
-                <label for="floatingEmail">Email address</label>
+                <input name="adminID" type="text" class="form-control <?php if (isset($validAdminID) && !$validAdminID) echo "is-invalid"; ?>" id="floatingAdminID" placeholder="1001001" value="<?php if (isset($adminID)) echo $adminID; ?>" required>
+                <label for="floatingAdminID">Admin ID</label>
             </div>
             <div class="form-floating">
                 <input name="password" type="password" class="form-control <?php if ($emptyPassword) echo "is-invalid"; ?>" id="floatingPassword" placeholder="Password" required>
-
                 <label for="floatingPassword">Password</label>
             </div>
             <?php
@@ -98,11 +93,6 @@ HTML;
                 <label class="">
                     <input type="checkbox" value="remember-me"> Remember me
                 </label>
-            </div>
-
-            <div class="my-3">
-                <a href="" class="px-3">Forgot Password</a>
-                <a href="<?php echo "$sevRoot/Sign_In/Sign_Up.php" ?>" class="px-3">Register Here</a>
             </div>
             <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
         </form>

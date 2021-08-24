@@ -2,17 +2,36 @@
 require_once dirname(__FILE__) . "/../env_variables.php";
 // logging
 // console logs to browser using javascript
+function concatPaths(...$paths)
+{
+    $toReturn = array_shift($paths);
+    foreach ($paths as $path) {
+        if ($path != "") {
+            $toReturn .=  "/" . $path;
+        }
+    }
+    return  $toReturn;
+}
+
 function consoleLog(...$args)
 {
-    $echoedString = "<script>console.log(" . "\"" . array_shift($args) . "\"";
+    $echoedString = "<script>console.log(" . "`" . array_shift($args) . "`";
 
     foreach ($args as $strings) {
-        $echoedString .= ", \"" . $strings . "\"";
+        $echoedString .= ", `" . $strings . "`";
     }
 
     $echoedString .= ");</script>";
 
     echo $echoedString;
+}
+
+function getVariableParentPath($fullPath, $levelsUp)
+{
+    $path = parse_url($fullPath)["path"];
+    $pathArr  = explode("/", $path);
+    $discardedChilds = array_slice($pathArr,  0, -$levelsUp);
+    return implode("/", $discardedChilds);
 }
 
 function pretty($arr)
@@ -39,12 +58,12 @@ function unSetSession()
     session_destroy();
 }
 
-function registerUser($firstName, $lastName, $email, $password)
+function registerUser($firstName, $lastName, $email, $password, $gender)
 {
     $db = new Database();
     $passwordHash = $password; //md5($password);
-    $cols = array("email", "first_name", "last_name", "password");
-    $values = array($email, $firstName, $lastName, $passwordHash);
+    $cols = array("email", "first_name", "last_name", "password", "gender");
+    $values = array($email, $firstName, $lastName, $passwordHash, $gender);
     $db->insert($cols, $values, "user");
 }
 
@@ -73,6 +92,9 @@ function processLogin($email, $password)
     // else die because multiple records
 }
 
+
+
+
 // database class call it to establish mysql connection
 class Database
 {
@@ -85,6 +107,12 @@ class Database
     public $queryResult;
 
     private const tableColNames = array(
+        "administrator" => array(
+            "admin_id",
+            "password",
+            "first_name",
+            "last_name"
+        ),
         "user" => array(
             "user_id",
             "email",
@@ -220,6 +248,15 @@ class Database
         );
         $whereStatement = "email = '$email' AND password = '$passwordHash'";
         return $this->select($colArray, $whereStatement);
+    }
+
+    function loginPasswordAdmin($adminID, $passwordHash)
+    {
+        $colArray = array(
+            "admin_id", "password"
+        );
+        $whereStatement = "admin_id = '$adminID' AND password = '$passwordHash'";
+        return $this->select($colArray, $whereStatement, "administrator");
     }
 
     function getFullNameWithEmail($email)

@@ -28,6 +28,7 @@ if ($result) {
 </head>
 
 <body>
+    <img src="C:/xampp/htdocs/WEB-Design-Assignment-DFT2S1-main/resources/user_icon.jpg" alt="">
     <?php //echo time(); 
     ?>
 

@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . "/../env_variables.php";
+require_once "$docRoot/utility/utility.php";
 ?>
 <div id="admin-sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
@@ -8,10 +9,10 @@ require_once dirname(__FILE__) . "/../env_variables.php";
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <?php
-        $basePath = "$sevRoot/admin";
 
-        // revenue tab
+        // to add revenue tab
         $dirList = array(
+            "index.php" => "Home",
             'users' => array(
                 "list_user.php" => "List Users",
                 "add_user.php" => "Add Users",
@@ -26,48 +27,86 @@ require_once dirname(__FILE__) . "/../env_variables.php";
                 // "edit_participant.php" => "Edit Participants",
             ),
         );
+
         $activeStatus = "";
+        $basePath = "$sevRoot/admin";
 
-        function getVariableParentPath($fullPath, $levelsUp)
+        function createSideMenu($dirArray, $currentPath /*, $nestNo = 0*/)
         {
-            $path = parse_url($fullPath)["path"];
-            $pathArr  = explode("/", $path);
-            $discardedChilds = array_slice($pathArr,  0, -$levelsUp);
-            return implode("/", $discardedChilds);
-        }
-
-        $grandParentPath = getVariableParentPath($_SERVER['PHP_SELF'], 2);
-        foreach ($dirList as $childDir => $fileArr) {
             $currentParentPath = getVariableParentPath($_SERVER['PHP_SELF'], 1);
-            if ($currentParentPath  == $grandParentPath . "/" . $childDir) {
-                $activeStatus = "active";
-            } else {
-                $activeStatus = "btn-secondary";
-            }
+            $currentFullPath = $_SERVER['PHP_SELF'];
+            foreach ($dirArray as $dir => $dirOrFiles) {
 
-            echo <<<HTML
+                if (is_array($dirOrFiles)) {
+                    // consoleLog($currentPath, $dir);
+                    if ($currentParentPath  == concatPaths($currentPath, $dir)) {
+                        $activeStatus = "active";
+                        // $activeStatus = "parent yes";
+                    } else {
+                        $activeStatus = "btn-secondary";
+                        // $activeStatus = "parent no";
+                    }
+                    // =============== DEBUG ==============================
+                    // $tabs = str_repeat("\t", $nestNo);
+                    // $toLog = sprintf("
+                    // {$tabs}current Parent path: $currentParentPath
+                    // {$tabs}virtual dir : $currentPath/$dir
+                    // {$tabs}Current Active Path? : $activeStatus
+                    // {$tabs}Nest No? : $nestNo
+                    // ");
+                    // consoleLog($toLog);
+                    // echo "\n";
+                    // =============== DEBUG ==============================
+
+                    echo <<<HTML
                     <li>
                         <button class="btn btn-primary $activeStatus" style="text-align:left; width:100%;">
-                        $childDir
+                        $dir
                         </button>
                         <ul class="nav nav-pills flex-column subSideBar" >
 HTML;
-            foreach ($fileArr as $files => $names) {
-                if ($_SERVER['PHP_SELF']  == $grandParentPath . "/" . $childDir . "/" . $files) {
-                    $childActiveStatus = "bg-light text-dark";
-                } else {
-                    $childActiveStatus = "text-white ";
-                }
-                echo  <<<HTML
-                            <li >
-                                <a href="$grandParentPath/$childDir/$files" class="nav-link $childActiveStatus">$names</a>
-                            </li>
-HTML;
-            }
 
-            echo "</ul>";
-            echo "</li>";
+                    createSideMenu(
+                        $dirOrFiles,
+                        concatPaths($currentPath, $dir) //,
+                        //$nestNo + 1
+                    );
+                    echo "  </ul>";
+                    echo "</li>";
+                } else if (is_string($dir)) {
+                    if ($currentFullPath == concatPaths($currentPath, $dir)) {
+                        $childActiveStatus = "bg-light text-dark";
+                        //$childActiveStatus = "child yes";
+                    } else {
+                        $childActiveStatus = "text-white ";
+                        // $childActiveStatus = "child no";
+                    }
+
+                    echo  <<<HTML
+                    <li >
+                        <a href="$currentPath/$dir" class="nav-link $childActiveStatus">$dirOrFiles</a>
+                    </li>
+HTML;
+
+                    // =============== DEBUG ==============================
+                    // $tabs = str_repeat("\t", $nestNo + 1);
+                    // $toLog = sprintf("
+                    //     {$tabs}current Full path: $currentFullPath
+                    //     {$tabs}virtual dir : $currentPath/$dir
+                    //     {$tabs}Current Active Path? : $childActiveStatus
+                    //     {$tabs}Nest No? : $nestNo
+                    // ");
+
+                    // consoleLog($toLog);
+                    // echo "\n";
+                    // =============== DEBUG ==============================
+
+                }
+            }
         }
+
+        createSideMenu($dirList, $basePath);
+
         ?>
     </ul>
 
