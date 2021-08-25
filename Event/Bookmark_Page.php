@@ -1,3 +1,7 @@
+<?php  
+session_start();
+$isLogin = !empty($_SESSION['userID']) ? true : false;
+?>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -8,6 +12,22 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         <link href="index.css" type="text/css" rel="stylesheet">
         <link href="event.css" type="text/css" rel="stylesheet">
+        <script>
+            function removebookmarkList(eventTitle, userId) {
+                var url = "removeBookmark.php";
+                var params = `eventTitle=${eventTitle}&userID=${userId}`;
+                var http = new XMLHttpRequest();
+
+                http.open("GET", url+"?"+params, true);
+                http.onreadystatechange = function()
+                {
+                    if(http.readyState == 4 && http.status == 200) {
+                        alert(http.responseText);
+                    }
+                }
+                http.send(null);
+                }
+        </script>
     </head>
     <body class="bg-dark text-white">
         <?php include "../header.php" ?>
@@ -15,14 +35,7 @@
         <section class="bodyDetails">
         <h1>Bookmarked Event List</h1>
         <?php 
-            
-            $Event_Title = $_GET['Event_Title'];
-            echo bookmarkList($Event_Title); 
-            if(!isset($_SESSION['bookmarks'])){
-                $bookmarksArr = array();
-                $_SESSION['bookmarks'] = $bookmarkArr;
-            }
-            array_push($_SESSION['bookmarks'],$Event_Title);
+        getBookmarkedEvent($_SESSION['userID']);
         ?>
         </section>
         <?php include "../footer.php" ?>

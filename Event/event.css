@@ -53,7 +53,7 @@ div.col-2-3{
 button.addToCart {
     text-decoration: none;
 }
-button.addBookmarkButton {
+button#bookmarkButton {
     text-decoration: none;
 }
 

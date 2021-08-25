@@ -14,13 +14,30 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         <link href="index.css" type="text/css" rel="stylesheet">
         <link href="event.css" type="text/css" rel="stylesheet">
+        <script>
+            function bookmarkEvent(eventTitle, userId) {
+                var url = "bookmark.php";
+                var params = `eventTitle=${eventTitle}&userID=${userId}`;
+                var http = new XMLHttpRequest();
+
+                http.open("GET", url+"?"+params, true);
+                http.onreadystatechange = function()
+                {
+                    if(http.readyState == 4 && http.status == 200) {
+                        alert(http.responseText);
+                    }
+                }
+                http.send(null);
+                }
+        </script>
     </head>
     <body class="bg-dark text-white">
         <?php include "../header.php" ?>
         <?php include "event_helper.php" ?>
         <section class="bodyDetails">
-            <h1>Event List</h1><br><br>
-            <?php echo getEventDetails(); ?>
+            <h1>Event List</h1>
+            <?php echo getEventDetails(); 
+            ?>
         </section>
         <?php include "../footer.php" ?>
     </body>
