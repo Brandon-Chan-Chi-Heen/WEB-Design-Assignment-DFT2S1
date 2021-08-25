@@ -17,8 +17,8 @@ require_once dirname(__FILE__) . "/env_variables.php";
                 <li><a href="<?php echo "$sevRoot/index.php#About-Us" ?>" class="nav-link px-2 text-white">About</a></li>
             </ul>
 
-            <form class="mb-0 mx-3">
-                <input type="search" class="form-control form-control-primary form-control-dark" placeholder="Search...">
+            <form class="mb-0 mx-3" action="<?php echo "$sevRoot/Event/event.php"; ?>" method="GET">
+                <input name="search" type="text" class="form-control form-control-primary form-control-dark" placeholder="Search...">
             </form>
 
             <?php

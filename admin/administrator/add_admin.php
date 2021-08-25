@@ -3,18 +3,23 @@ session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
 include "$docRoot/admin/redirectNonAdmin.php";
-
+require_once "$docRoot/admin/admin_utility.php";
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
         // data validation
         // could change all variables to be part of an array, 
+        $adminId = isset($_POST['adminID']) ? $_POST['adminID'] : '';
         $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
         $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
         $password = isset($_POST['password']) ? $_POST['password'] : '';
         $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
+
+        $validAdminId = false;
+        if (!empty($adminId)) {
+            $validAdminId = true;
+        }
 
         $regExp = "/^[a-zA-Z\s]*$/";
         $validFirstName = false;
@@ -30,12 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $validNames = $validFirstName && $validLastName;
 
-        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
-        $validEmail = false;
-        if (!empty($email) && preg_match($regExp, $email)) {
-            $validEmail = true;
-        }
-
         $validPassword = false;
         $emptyPassword = true;
         if (!empty($password) && !empty($confirmPassword)) {
@@ -45,26 +44,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validPassword = !$emptyPassword && true;
         }
 
-        $validData = $validPassword && $validEmail && $validNames;
+        $validData = $validPassword && $validAdminId && $validNames;
 
         // attempt to register
         // error upon same email
 
         // variables for error handling
-        $duplicateEmail = false;
-        $registerSuccess = false;
+        $duplicateId =  false;
+        $addSuccess = false;
         if ($validData) {
             try {
-                registerUser($firstName, $lastName, $email, $password, $gender);
-                $registerSuccess = true;
+                addAdmin($adminId, $firstName, $lastName, $password);
+                $addSuccess = true;
             } catch (Exception $e) {
-                // email exists or existing user
+                // ID exists or existing user
                 consoleLog("Error occured");
                 switch ($e->getCode()) {
                     case 1062:
-                        $duplicateEmail = true;
-                        consoleLog($duplicateEmail ? "true" : "false");
-                        $registerSuccess = false;
+                        $duplicateId = true;
+                        consoleLog($duplicateId ? "true" : "false");
+                        $addSuccess = false;
                         consoleLog($e->getMessage());
                         break;
                     default:
@@ -73,10 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        if ($registerSuccess) {
+        if ($addSuccess) {
+            $adminId = '';
             $firstName = '';
             $lastName = '';
-            $email = '';
             $password =  '';
             $confirmPassword = '';
         }
@@ -96,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
-    <link href="user.css" type="text/css" rel="stylesheet">
+    <link href="admin.css" type="text/css" rel="stylesheet">
 </head>
 
 <body class="bg-dark">
@@ -106,13 +105,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <section class="text-white">
 
-        <h1>Add User</h1>
+        <h1>Add Admins</h1>
 
         <form class="g-3 needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
+            <div class="col-md-4 mb-3">
+                <label for="adminIdInput" class="form-label">Admin ID</label>
+                <input name="adminID" type="text" class="<?php
+                                                            echo "form-control ";
+                                                            if (
+                                                                isset($duplicateId) && $duplicateId ||
+                                                                isset($validAdminId) && !$validAdminId
+                                                            ) {
+                                                                echo "is-invalid ";
+                                                            }
+                                                            ?>" id="adminIdInput" value="<?php if (isset($adminId)) echo $adminId; ?>" placeholder="10001" required>
+                <?php
+                if (isset($duplicateId) && $duplicateId) {
+                    echo <<<HTML
+                        <div class="invalid-feedback">
+                            ID Already Exists! Please Use Another ID.
+                        </div>
+HTML;
+                } else {
+                    echo <<<HTML
+                        <div class="invalid-feedback">
+                            Please enter a valid ID
+                        </div>
+HTML;
+                }
+                ?>
+            </div>
 
             <div class="col-md-3 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
-                <input name="firstName" type="text" class="form-control " id="firstNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($firstName)) echo $firstName; ?>" placeholder="John" required>
+                <input name="firstName" type="text" class="form-control" id="firstNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($firstName)) echo $firstName; ?>" placeholder="John" required>
                 <div class="invalid-feedback">
                     Please a valid First name
                 </div>
@@ -132,30 +158,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-4 mb-3 email-div">
-                <label for="emailInput" class="form-label">Email address</label>
-                <input name="email" type="email" class="<?php
-                                                        echo "form-control ";
-                                                        if (isset($duplicateEmail) && $duplicateEmail) {
-                                                            echo "is-invalid ";
-                                                        }
-                                                        ?>" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" value="<?php if (isset($email)) echo $email; ?>" placeholder="name@example.com" required>
-                <?php
-                if (isset($duplicateEmail) && $duplicateEmail) {
-                    echo <<<HTML
-                        <div class="invalid-feedback">
-                            Email Already Exists! Please Use Another Email.
-                        </div>
-HTML;
-                } else {
-                    echo <<<HTML
-                        <div class="invalid-feedback">
-                            Please enter a valid email
-                        </div>
-HTML;
-                }
-                ?>
-            </div>
 
             <div class="row">
                 <div class="col-md-3 mb-3">
@@ -165,7 +167,6 @@ HTML;
                     <div class="invalid-feedback" id="emptyPass">
                         Password Cannot Be Empty
                     </div>
-
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="confirmPasswordInput">Confirm Password</label>
@@ -175,14 +176,16 @@ HTML;
                     </div>
 
                 </div>
+
+
             </div>
 
             <?php
-            if (isset($registerSuccess) && $registerSuccess) {
+            if (isset($addSuccess) && $addSuccess) {
                 echo <<<HTML
                     <div class="col-md-5 text-success">
                     <h1>
-                        Record Added
+                        Admin Added
                     </h1>
                     </div>
 HTML;
@@ -192,9 +195,9 @@ HTML;
             <div class="col-12">
                 <button class="btn btn-primary" type="submit">Register</button>
                 <?php
-                if (isset($registerSuccess) && $registerSuccess) {
+                if (isset($addSuccess) && $addSuccess) {
                     echo <<<HTML
-                        <a class="btn btn-primary" href="list_user.php">Return</a>
+                        <a class="btn btn-primary" href="list_admins.php">Return</a>
 HTML;
                 }
                 ?>
@@ -223,9 +226,7 @@ HTML;
                 let confirmPassword = document.getElementById('confirmPasswordInput');
                 let emptyPassDisplay = document.getElementById('emptyPass');
                 let diffPassDisplay = document.getElementById('diffPass');
-                let email = document.getElementById('emailInput');
 
-                console.log(form);
                 form.addEventListener('submit', function(event) {
                     // password stuffs
                     if (password.value === "" || confirmPassword.value === "" || password.value != confirmPassword.value) {
@@ -246,10 +247,10 @@ HTML;
                         }
 
                         addClass(toAdd, "invalid-feedback");
-                        removeClass(toAdd, "hidden");
+                        removeClass(toAdd, "d-none");
 
                         removeClass(toRemove, "invalid-feedback");
-                        addClass(toRemove, "hidden");
+                        addClass(toRemove, "d-none");
 
                         event.preventDefault()
                         event.stopPropagation()
@@ -265,22 +266,27 @@ HTML;
                         event.stopPropagation()
                     }
 
-                    form.classList.add('was-validated')
+                    form.classList.add('was-validated');
                 }, false)
 
+
                 <?php
-                if (isset($duplicateEmail) && $duplicateEmail) {
+                if (isset($duplicateId) && $duplicateId) {
                     echo <<<JAVASCRIPT
-                        email.addEventListener('input', (event) => {
-                            if (email.value !== "$email") {
-                                email.classList.remove("is-invalid");
+                        let adminID = document.getElementById('adminIdInput');
+
+                        adminID.addEventListener('input', (event) => {
+                            if (adminID.value !== "$adminId") {
+                                adminID.classList.remove("is-invalid");
                                 console.log("valid Text")
-                            } else if (!email.classList.contains("is-invalid") && email.value === "$email") {
-                                email.classList.add("is-invalid");
+                            } else if (!adminID.classList.contains("is-invalid") && adminID.value === "$adminId") {
+                                adminID.classList.add("is-invalid");
                                 console.log("invalid Text")
                             }
                         }, false);
 JAVASCRIPT;
+                } else {
+                    echo "hi";
                 }
                 ?>
             })()

@@ -5,22 +5,22 @@ include "$docRoot/utility/utility.php";
 include "$docRoot/admin/redirectNonAdmin.php";
 
 
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['user_id'])) {
-    $_SESSION["cur_edit_id"] = $_GET['user_id'];
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['admin_id'])) {
+    $_SESSION["cur_edit_id"] = $_GET['admin_id'];
 } else if (empty($_SESSION['cur_edit_id'])) {
     echo <<<JAVASCRIPT
                 <script>
                     alert(`No record selected, Please select first.
                          Enter To Continue`); 
-                    window.location='list_participants.php';
+                    window.location='list_admins.php';
                 </script>
 JAVASCRIPT;
     die();
 }
 
 $db = new Database();
-$result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
-[$firstName, $lastName, $email] = $result;
+$result = $db->select(array('admin_id', 'first_name', 'last_name'), "admin_id = {$_SESSION['cur_edit_id']}", 'administrator')[0];
+[$adminID, $firstName, $lastName] = $result;
 
 function validationCheck($changeArray, $colName)
 {
@@ -28,7 +28,7 @@ function validationCheck($changeArray, $colName)
     if ($changeArray[$colName]["change_status"]) {
 
         // check if value is empty, if its empty it failed the validation check
-        // heck if it succesfully updated the database
+        // check if it succesfully updated the database
         if (!empty($changeArray[$colName]["value"] && $changeArray[$colName]["updated_status"])) {
             return true;
         } else {
@@ -53,16 +53,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
         $changeArray = array();
         initChangeArray($changeArray, array(
-            "first_name", "last_name", "email", "password"
+            "admin_id", "first_name", "last_name", "password"
         ));
         $changeArray["password"]["empty_pass"] = true;
         $changeArray["password"]["same_pass"] = false;
 
-        $firstName = !empty($_POST['firstName']) ? $_POST['firstName'] : '';
-        $lastName = !empty($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = !empty($_POST['email']) ? $_POST['email'] : '';
-        $password = !empty($_POST['password']) ? $_POST['password'] : '';
-        $confirmPassword = !empty($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
+        $adminID = isset($_POST['adminID']) ? $_POST['adminID'] : '';
+        $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
+        $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
+        $password = isset($_POST['password']) ? $_POST['password'] : '';
+        $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
+
+        if (!empty($adminID)) {
+            $changeArray["admin_id"]["change_status"] = true;
+            $changeArray["admin_id"]["value"] = $adminID;
+        }
 
         $regExp = "/^[a-zA-Z\s]*$/";
 
@@ -80,14 +85,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
-        if (!empty($email)) {
-            $changeArray["email"]["change_status"] = true;
-            if (preg_match($regExp, $email)) {
-                $changeArray["email"]["value"] = $email;
-            }
-        }
-
         //either password is empty, check failed
         if (!empty($password) || !empty($confirmPassword)) {
             $changeArray["password"]["change_status"] = true;
@@ -100,15 +97,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $whereStatement = "user_id = {$_SESSION['cur_edit_id']}";
+        $whereStatement = "admin_id = {$_SESSION['cur_edit_id']}";
 
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
-                $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'user');
+                $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'administrator');
             }
         }
-        $result = $db->select(array('first_name', 'last_name', 'email'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
-        [$firstName, $lastName, $email] = $result;
+        if ($changeArray['admin_id']["updated_status"]) {
+            $_SESSION['cur_edit_id'] = $adminID;
+        }
+        $result = $db->select(array('admin_id', 'first_name', 'last_name'), "admin_id = {$_SESSION['cur_edit_id']}", 'administrator')[0];
+        [$adminID, $firstName, $lastName] = $result;
         $db->disconnect();
     }
 }
@@ -128,9 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
-    <link href="participant.css" type="text/css" rel="stylesheet">
-
-
+    <link href="user.css" type="text/css" rel="stylesheet">
 </head>
 
 <body class="bg-dark">
@@ -140,10 +138,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <section class="text-white">
 
-        <h1>Edit User</h1>
+        <h1>Edit Admin</h1>
 
         <form class="g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
-            <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_id"])) echo $_SESSION["cur_edit_id"]; ?>">
+
+            <div class="col-md-6 mb-3">
+                <label for="adminIdInput" class="form-label">Email address</label>
+                <input name="adminID" type="text" class="form-control" id="adminIdInput" placeholder="<?php if (isset($adminID)) echo $adminID; ?>" required>
+                <?php
+                if (isset($changeArray)) {
+                    if ($changeArray["admin_id"]["change_status"]) {
+                        echo '<div class="invalid-feedback">';
+
+                        // check if value is empty, if its empty it failed the validation check
+                        if (!empty($changeArray["admin_id"]["value"])) {
+
+                            // check if it succesfully updated the database
+                            if (!$changeArray["admin_id"]["updated_status"]) {
+                                echo 'ID Exists in Database, Please Choose Another Email';
+                            }
+                        } else {
+                            echo 'Please enter a valid ID';
+                        }
+
+                        echo '</div>';
+                    }
+                }
+                ?>
+                <div class="valid-feedback">
+                    Changed!
+                </div>
+            </div>
+
             <div class="col-md-4 mb-3">
                 <label for="firstNameInput" class="form-label">First Name</label>
                 <input name="firstName" type="text" class="form-control " id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
@@ -166,35 +192,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3">
-                <label for="emailInput" class="form-label">Email address</label>
-                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" placeholder="<?php if (isset($email)) echo $email; ?>" required>
-                <?php
-                if (isset($changeArray)) {
-                    if ($changeArray["email"]["change_status"]) {
-                        echo '<div class="invalid-feedback">';
-
-                        // check if value is empty, if its empty it failed the validation check
-                        if (!empty($changeArray["email"]["value"])) {
-
-                            // check if it succesfully updated the database
-                            if (!$changeArray["email"]["updated_status"]) {
-                                echo 'Email Exists in Database, Please Choose Another Email';
-                            }
-                        } else {
-                            echo 'Please enter a valid email';
-                        }
-
-                        echo '</div>';
-                    }
-                }
-                ?>
-
-
-                <div class="valid-feedback">
-                    Changed!
-                </div>
-            </div>
             <div class="col-md-8 row g-0 mb-3 pt-3">
                 <div class="col-md-6 mb-3 ">
                     <label for="passwordInput">Password</label>
@@ -229,8 +226,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="col-12">
                 <button class="btn btn-primary" type="submit">Save</button>
-                <a class="btn btn-primary" href="list_participants.php">Return</a>
-
+                <a class="btn btn-primary" href="list_admins.php">Return</a>
             </div>
         </form>
 
@@ -238,8 +234,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <script>
             <?php
-            $idList = array("firstNameInput", "lastNameInput", "emailInput", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
-            $fieldNameList = array("first_name", "last_name", "email", "password", "password", "password");
+            $idList = array("firstNameInput", "lastNameInput", "adminIdInput", "passwordInput", "confirmPasswordInput", "passwordErrorWrapper");
+            $fieldNameList = array("first_name", "last_name", "admin_id", "password", "password", "password");
             if (isset($changeArray)) {
                 for ($i = 0; $i < count($idList); $i++) {
                     if (!is_null(validationCheck($changeArray, $fieldNameList[$i]))) {

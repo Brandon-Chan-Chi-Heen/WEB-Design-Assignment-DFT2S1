@@ -26,6 +26,10 @@ require_once "$docRoot/utility/utility.php";
                 "add_participant.php" => "Add Participants",
                 // "edit_participant.php" => "Edit Participants",
             ),
+            'administrator' => array(
+                "list_admins.php" => "List Admins",
+                "add_admin.php" => "Add Admin",
+            )
         );
 
         $activeStatus = "";
