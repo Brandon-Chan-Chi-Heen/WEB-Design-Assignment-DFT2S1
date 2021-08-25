@@ -1,20 +1,22 @@
 <?php
+
+
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'assignment');
 function getEventDetails() {
-    define('DB_HOST', 'localhost');
-    define('DB_USER', 'root');
-    define('DB_PASS', '');
-    define('DB_NAME', 'assignment');
+
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM display_event";
     if ($result = $con->query($sql)) {
-        $pictureNumber = 1;
         while ($row = $result->fetch_object()) {
             $eventTitle = $row->Event_Title;
             //Event Details
             echo <<< HELLO
                 <div class="Event">
                     <div  class="col-1-3 specials">
-                    <img src="eventNo$pictureNumber.jpg" alt="" class="picture"/>
+                    <img src="$eventTitle.jpg" alt="" class="picture"/>
                     </div>
                     <div class="col-2-3 specials">
                         <div class="Details">
@@ -33,7 +35,6 @@ function getEventDetails() {
                     </div>
                 </div>
 HELLO;
-            $pictureNumber++;
         }
         if(isset($_POST['bookmarkAlert'])) {
                 echo '<script>alert("Successfully added bookmark")</script>';
@@ -44,10 +45,6 @@ HELLO;
 }
 
 function getBookmarkedEvent($userID) {
-    define('DB_HOST', 'localhost');
-    define('DB_USER', 'root');
-    define('DB_PASS', '');
-    define('DB_NAME', 'assignment');
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM bookmarks WHERE user_id = $userID";
     if ($result = $con->query($sql)) {
@@ -91,4 +88,3 @@ HTML;
 function addToCartFunction() {
     
 }
-?>

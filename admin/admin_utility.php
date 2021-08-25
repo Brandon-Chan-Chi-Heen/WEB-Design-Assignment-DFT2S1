@@ -43,3 +43,12 @@ function processAdminLogin($adminID, $password)
     consoleLog($validCreds ? "true" : "false");
     return $validCreds;
 }
+
+function addAdmin($adminID, $firstName, $lastName, $password)
+{
+    $db = new Database();
+    $passwordHash = $password; //md5($password);
+    $cols = array("admin_id", "first_name", "last_name", "password");
+    $values = array($adminID, $firstName, $lastName, $passwordHash);
+    $db->insert($cols, $values, "administrator");
+}

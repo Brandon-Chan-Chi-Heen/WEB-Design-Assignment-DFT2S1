@@ -41,6 +41,7 @@ function pretty($arr)
     echo '</pre>';
 }
 
+
 // login utilities
 // sets session based on user email
 function setSession($email)

@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-7 mb-3 email-div">
+            <div class="col-md-7 mb-3">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="<?php
                                                         echo "form-control ";

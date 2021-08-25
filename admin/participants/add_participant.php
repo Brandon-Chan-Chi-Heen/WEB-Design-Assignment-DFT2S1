@@ -173,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3 email-div">
+            <div class="col-md-6 mb-3">
                 <label for="emailInput" class="form-label">Email address</label>
                 <input name="email" type="email" class="form-control <?php
                                                                         if (isset($changeArray)) {
