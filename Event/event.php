@@ -64,7 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
                     <div class="Details">
                         <div class="uploadEdit">
                             <h3>
-                                <button onclick="bookmarkEvent(`$eventTitle`,{$_SESSION['userID']} )">🔖</button>
+HELLO;                              
+                                    if(!empty($_SESSION['userID'])){
+                                        echo "<button onclick='bookmarkEvent(`$eventTitle`,{$_SESSION['userID']} )'>🔖</button>";
+                                    }
+            echo <<< HELLO
                             </h3>
                         </div>
                         <h1>$eventTitle</h1>
