@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     <link href="event.css" type="text/css" rel="stylesheet">
     <script>
         function bookmarkEvent(eventTitle, userId) {
+            console.log("Heelo");
             var url = "bookmark.php";
             var params = `eventTitle=${eventTitle}&userID=${userId}`;
             var http = new XMLHttpRequest();
@@ -63,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
                     <div class="Details">
                         <div class="uploadEdit">
                             <h3>
-                                <button onclick="bookmarkEvent('$eventTitle',{$_SESSION['userID']} )">🔖</button>
+                                <button onclick="bookmarkEvent(`$eventTitle`,{$_SESSION['userID']} )">🔖</button>
                             </h3>
                         </div>
                         <h1>$eventTitle</h1>
@@ -80,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 HELLO;
             }
         } else {
-
             echo getEventDetails();
         }
         ?>

@@ -1,12 +1,9 @@
 <?php
-
-
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'assignment');
 function getEventDetails() {
-
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM display_event";
     if ($result = $con->query($sql)) {
@@ -22,7 +19,11 @@ function getEventDetails() {
                         <div class="Details">
                             <div class="uploadEdit">
                                 <h3>
-                                    <button onclick="bookmarkEvent('$row->Event_Title',{$_SESSION['userID']} )">🔖</button>
+HELLO;                              
+                                    if(!empty($_SESSION['userID'])){
+                                        echo "<button onclick='bookmarkEvent(\"$row->Event_Title\",{$_SESSION['userID']} )'>🔖</button>";
+                                    }
+            echo <<< HELLO
                                 </h3>
                             </div>
                             <h1>$eventTitle</h1>
@@ -48,7 +49,6 @@ function getBookmarkedEvent($userID) {
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM bookmarks WHERE user_id = $userID";
     if ($result = $con->query($sql)) {
-        $pictureNumber = 1;
         while ($bookmarkrow = $result->fetch_object()) {
             $sql2 = "SELECT * FROM display_event WHERE Event_Title = '$bookmarkrow->Event_Title'";
             if ($result2 = $con->query($sql2)) {
@@ -56,7 +56,7 @@ function getBookmarkedEvent($userID) {
                     echo <<< HTML
                     <div class="Event">
                         <div  class="col-1-3 specials">
-                        <img src="eventNo$pictureNumber.jpg" alt="" class="picture"/>
+                        <img src="$bookmarkrow->Event_Title.jpg" alt="" class="picture"/>
                         </div>
                         <div class="col-2-3 specials">
                             <div class="Details">
@@ -76,7 +76,6 @@ function getBookmarkedEvent($userID) {
                     </div>
 HTML;
                 }
-                $pictureNumber++;
                 $result2->free();
             }
         }

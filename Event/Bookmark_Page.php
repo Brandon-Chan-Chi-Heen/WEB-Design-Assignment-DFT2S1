@@ -23,6 +23,9 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
                 {
                     if(http.readyState == 4 && http.status == 200) {
                         alert(http.responseText);
+                        if(http.responseText == 'Successfully Deleted Bookmarked Event. Please refresh to continue.'){
+                            window.location="Bookmark_Page.php";
+                        }
                     }
                 }
                 http.send(null);
