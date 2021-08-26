@@ -52,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     <section class="bodyDetails">
         <h1>Event List</h1>
         <?php
-        if (!empty($searchResult)) {
+        if(isset($searchResult)){
+            if (!empty($searchResult)) {
             foreach ($searchResult as $result) {
                 [$eventTitle, $eventDescription, $eventPrice] =  $result;
                 echo <<< HELLO
@@ -83,8 +84,12 @@ HELLO;
                 </div>
             </div>
 HELLO;
+                }
+            }else{
+                echo "No results found.";
             }
-        } else {
+        }
+        else {
             echo getEventDetails();
         }
         ?>
