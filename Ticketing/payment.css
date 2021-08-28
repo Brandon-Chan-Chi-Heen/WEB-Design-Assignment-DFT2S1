@@ -1,0 +1,33 @@
+/* Page Body Styles */
+section.bodyDetails {
+	width:95%;
+	min-width:640px;
+	max-width:960px;
+	margin-left:auto;
+	margin-right:auto;
+}
+/* Column Styles */
+div[class^="col-"] {
+    float:left;
+    padding:2%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.form-input quantity{
+    color: white;
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 100%;
+  max-width: 244px;
+}
+div.price{
+    margin-right: 10px;
+    text-decoration: none;
+    padding: 2px 5px;
+    color: white;
+    border-radius: 3px;
+    float: right;
+    float: inline-end;
+}
