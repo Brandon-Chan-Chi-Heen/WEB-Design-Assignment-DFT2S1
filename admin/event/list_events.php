@@ -9,7 +9,7 @@ include "$docRoot/admin/redirectNonAdmin.php";
 unsetEditSessions();
 
 $db = new Database();
-$result = $db->select(array("user_id", "email", "first_name", "last_name", "gender"), "", "user");
+$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), "", "display_event");
 
 $pageCount = ceil(count($result) / 10);
 $pageNo = 1;
@@ -25,16 +25,12 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['pageNo'])) {
     if ($_GET['pageNo'] >= 1 && $_GET['pageNo'] <= $pageCount) {
         $pageNo = $_GET['pageNo'];
     } else {
-        header("Location: $sevRoot/admin/users/list_user.php");
+        header("Location: $sevRoot/admin/users/list_events.php");
         die();
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST)) {
-        $userId = isset($_POST['userId']) ? $_POST['userId'] : '';
-        $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
-        $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
+        $eventTitle = isset($_POST['eventTitle']) ? $_POST['eventTitle'] : '';
 
         if ($_POST['pageNo'] >= 1 && $_POST['pageNo'] <= $pageCount) {
             $pageNo = $_POST['pageNo'];
@@ -42,23 +38,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['pageNo'])) {
         }
 
         $queryStatement = <<<SQL
-        DELETE FROM user 
+        DELETE FROM bookmarks
         WHERE 
-        user_id = $userId AND 
-        first_name = '$firstName' AND 
-        last_name = '$lastName' AND
-        email = '$email';
+        Event_Title = $eventTitle;
 SQL;
 
         $deleteStatus = $db->con->query($queryStatement) ? true : false;
     }
 }
-$result = $db->select(array("user_id", "email", "first_name", "last_name", "gender"), "", "user");
+
+$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), "", "display_event");
 $resultArr = $result;
 
 $pageCount = ceil(count($resultArr) / 10);
-
-
 ?>
 
 <!DOCTYPE html>
@@ -68,15 +60,15 @@ $pageCount = ceil(count($resultArr) / 10);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Event List</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
     <link href="user.css" type="text/css" rel="stylesheet">
     <script>
-        function toRedirect(userId, location) {
-            window.location = `${location}?user_id=${userId}`;
+        function toRedirect(eventTitle, location) {
+            window.location = `${location}?Event_Title=${eventTitle}`;
         }
 
         function enableModal(arr) {
@@ -84,21 +76,12 @@ $pageCount = ceil(count($resultArr) / 10);
             let tdObj = [
                 document.querySelector("#td1"),
                 document.querySelector("#td2"),
-                document.querySelector("#td3"),
-                document.querySelector("#td4"),
-                document.querySelector("#td5")
-            ]
-            let inputObj = [
-                document.querySelector('#userIdInput'),
-                document.querySelector('#emailInput'),
-                document.querySelector('#firstNameInput'),
-                document.querySelector('#lastNameInput'),
-                document.querySelector('#genderInput')
+                document.querySelector("#td3")
             ]
             for (let i = 0; i < tdObj.length; i++) {
                 tdObj[i].innerText = arr[i];
-                inputObj[i].value = arr[i];
             }
+            document.querySelector('#eventTitleInput').value = arr[0];
             myModal.show();
         }
     </script>
@@ -110,7 +93,6 @@ $pageCount = ceil(count($resultArr) / 10);
     include_once "../sidebar.php";
     ?>
 
-
     <div class="modal" tabindex="-1" id="myModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -121,29 +103,21 @@ $pageCount = ceil(count($resultArr) / 10);
                 <div class="modal-body">
                     <table class="event-list container" style="margin-top: 10px;">
                         <tr class="text-center">
-                            <th style="width:15%;">User Id</th>
-                            <th style="width:30%; text-align:left;">Email</th>
-                            <th style="width:20%;">First Name</th>
-                            <th style="width:20%;">Last Name</th>
-                            <th style="width:15%;">Gender</th>
+                            <th width="20%">Event Title</th>
+                            <th width="60%">Event Description</th>
+                            <th width="20%">Event Price</th>
                         </tr>
                         <tr class="text-center">
                             <td id="td1"></td>
                             <td id="td2" style="text-align:left;"></td>
                             <td id="td3"></td>
-                            <td id="td4"></td>
-                            <td id="td5"></td>
                         </tr>
                     </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-                        <input id="userIdInput" name="userId" type="hidden" value="">
-                        <input id="emailInput" name="email" type="hidden" value="">
-                        <input id="firstNameInput" name="firstName" type="hidden" value="">
-                        <input id="lastNameInput" name="lastName" type="hidden" value="">
-                        <input id="genderInput" name="gender" type="hidden" value="">
+                        <input id="eventTitleInput" name="eventTitle" type="hidden" value="">
                         <input id="pageNo" name="pageNo" type="hidden" value="<?php echo $pageNo; ?>">
                         <button type="submit" class="btn btn-danger ">Delete</button>
                     </form>
@@ -153,7 +127,7 @@ $pageCount = ceil(count($resultArr) / 10);
     </div>
 
     <section class="text-white">
-        <h1>Users</h1>
+        <h1>Events</h1>
 
         <?php
         if (isset($deleteStatus) && $deleteStatus) {
@@ -163,12 +137,10 @@ $pageCount = ceil(count($resultArr) / 10);
 
         <table class="event-list">
             <tr class="text-center">
-                <th style="width:10%;">User Id</th>
-                <th style="width:40%; text-align:left;">Email</th>
-                <th style="width:15%;">First Name</th>
-                <th style="width:15%;">Last Name</th>
-                <th style="width:5%;">Gender</th>
-                <th style="width:15%;">Actions</th>
+                <th width="15%">Event Title</th>
+                <th width="60%">Event Description</th>
+                <th width="10%">Event Price</th>
+                <th width="15%">Actions</th>
             </tr>
 
             <?php
@@ -180,11 +152,9 @@ $pageCount = ceil(count($resultArr) / 10);
                         <td>{$resultArr[$i][0]}</td>
                         <td  style="text-align:left;">{$resultArr[$i][1]}</td>
                         <td>{$resultArr[$i][2]}</td>
-                        <td>{$resultArr[$i][3]}</td>
-                        <td>{$resultArr[$i][4]}</td>
                         <td>
-                            <button onclick="toRedirect({$resultArr[$i][0]}, 'edit_user.php')" class="btn btn-primary">Edit</button>
-                            <button class="btn btn-danger" onclick="enableModal([{$resultArr[$i][0]}, '{$resultArr[$i][1]}', '{$resultArr[$i][2]}', '{$resultArr[$i][3]}', '{$resultArr[$i][4]}']);">Delete</button>
+                            <button onclick="toRedirect({$resultArr[$i][0]}, 'edit_event.php')" class="btn btn-primary">Edit</button>
+                            <button class="btn btn-danger" onclick="enableModal([{$resultArr[$i][0]}, '{$resultArr[$i][1]}', '{$resultArr[$i][2]}']);">Delete</button>
                         </td>
 
                     </tr>

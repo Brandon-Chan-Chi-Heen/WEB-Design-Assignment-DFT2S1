@@ -18,13 +18,22 @@ require_once "$docRoot/utility/utility.php";
                 "add_user.php" => "Add Users",
                 // "edit_user.php" => "Edit Users"
             ),
+            'bookmarks' => array(
+                "list_bookmarks.php" => "List Bookmarks",
+                "add_bookmark.php" => "Add Bookmark",
+            ),
             'event' => array(
-                "list_event.php" => "List Events",
+                "list_events.php" => "List Events",
+                "add_event.php" => "Add Events",
             ),
             'participants' => array(
                 "list_participants.php" => "List Participants",
                 "add_participant.php" => "Add Participants",
                 // "edit_participant.php" => "Edit Participants",
+            ),
+            'cart' => array(
+                "list_carts.php" => "List carts",
+                "add_cart.php" => "Add cart",
             ),
             'administrator' => array(
                 "list_admins.php" => "List Admins",
