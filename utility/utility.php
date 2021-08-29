@@ -15,10 +15,20 @@ function concatPaths(...$paths)
 
 function consoleLog(...$args)
 {
-    $echoedString = "<script>console.log(" . "`" . array_shift($args) . "`";
+    if (end($args) == "\"") {
+        $stringQuotes = "\"";
+        array_pop($args);
+    } else if (end($args) == "'") {
+        $stringQuotes = "'";
+        array_pop($args);
+    } else {
+        $stringQuotes = "`";
+    }
+
+    $echoedString = "<script>console.log(" . $stringQuotes . array_shift($args) . $stringQuotes;
 
     foreach ($args as $strings) {
-        $echoedString .= ", `" . $strings . "`";
+        $echoedString .= ", $stringQuotes" . $strings . $stringQuotes;
     }
 
     $echoedString .= ");</script>";
@@ -114,6 +124,11 @@ class Database
             "first_name",
             "last_name"
         ),
+        "bookmarks" => array(
+            "user_id",
+            "Event_Title",
+            "quantity"
+        ),
         "user" => array(
             "user_id",
             "email",
@@ -208,7 +223,7 @@ class Database
 
         $this->queryResult = $this->con->query($queryStatement);
 
-        if ($this->con->errno == 1062) {
+        if (!empty($this->con->errno)) {
             throw new Exception(mysqli_error($this->con), mysqli_errno($this->con));
         }
         consoleLog($this->queryResult);

@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="firstNameInput" class="form-label">First Name</label>
                 <input name="firstName" type="text" class="form-control " id="firstNameInput" pattern="^[a-zA-Z\s]*$" value="<?php if (isset($firstName)) echo $firstName; ?>" placeholder="John" required>
                 <div class="invalid-feedback">
-                    Please a valid First name
+                    Please Enter a valid First name
                 </div>
                 <div class="valid-feedback">
                     Looks good!

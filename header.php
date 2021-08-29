@@ -31,7 +31,7 @@ require_once dirname(__FILE__) . "/env_variables.php";
                         <img src="$sevRoot/utility/getImage.php?user_id={$_SESSION['userID']}" alt="user" style="width:32px;height:32px;object-fit:cover;" class="rounded-circle mx-2" >
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="Bookmark_Page.php">Bookmarked Events</a></li>
+                        <li><a class="dropdown-item" href="#">Bookmarked Events</a></li>
                         <li><a class="dropdown-item" href="#">Registered Events</a></li>
                         <li><a class="dropdown-item" href="#">Payment Page</a></li>
                         <li><a class="dropdown-item" href="$sevRoot/Sign_In/profile.php">Edit Profile</a></li>
