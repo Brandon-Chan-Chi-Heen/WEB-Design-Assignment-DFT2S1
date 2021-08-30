@@ -8,7 +8,7 @@
             define('DB_PASS', '');
             define('DB_NAME', 'assignment');
             $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-            $sql = "DELETE FROM bookmarks WHERE user_id = `$UserId` && Event_Title = `$EventTitle`";
+            $sql = "DELETE FROM cart WHERE user_id = '$UserId' && Event_Title = '$EventTitle'";
             if ($con -> connect_errno) {
                 echo "Failed to connect to Localhost: " . $con -> connect_error;
                 exit();
@@ -16,7 +16,6 @@
             $con ->query($sql);
             if($con->affected_rows > 0)
             {
-                // Successfully Bookmarked Event.
                 echo 'Successfully Deleted Event From Cart.';
             }
             else
