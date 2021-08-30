@@ -33,7 +33,7 @@ require_once dirname(__FILE__) . "/env_variables.php";
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="$sevRoot/Event/Bookmark_Page.php">Bookmarked Events</a></li>
                         <li><a class="dropdown-item" href="#">Registered Events</a></li>
-                        <li><a class="dropdown-item" href="#">Payment Page</a></li>
+                        <li><a class="dropdown-item" href="$sevRoot/Ticketing/Payment.php">Payment Page</a></li>
                         <li><a class="dropdown-item" href="$sevRoot/Sign_In/profile.php">Edit Profile</a></li>
                         <li>
                             <hr class="dropdown-divider">
