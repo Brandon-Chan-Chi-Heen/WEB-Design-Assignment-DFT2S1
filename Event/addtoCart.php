@@ -19,12 +19,12 @@
             if($con->affected_rows > 0)
             {
                 // Successfully Bookmarked Event.
-                echo 'Successfully Added To Cart';
+                echo 'Successfully Added To Cart. You can change quantity in cart.';
             }
             else
             {
                 // Something goes wrong.
-                echo 'Cart Already added';
+                echo 'Cart Already Added. You can change quantity in cart.';
             }
             $con->close();
         }

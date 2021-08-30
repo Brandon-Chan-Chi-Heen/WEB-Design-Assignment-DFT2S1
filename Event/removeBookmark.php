@@ -16,12 +16,10 @@
             $con ->query($sql);
             if($con->affected_rows > 0)
             {
-                // Successfully Bookmarked Event.
                 echo 'Successfully Deleted Bookmarked Event.';
             }
             else
             {
-                // Something goes wrong.
                 echo 'You has already bookmarked this event';
             }
             $con->close();
