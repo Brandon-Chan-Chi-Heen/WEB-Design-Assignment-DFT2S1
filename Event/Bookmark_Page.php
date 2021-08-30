@@ -23,7 +23,7 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
                 {
                     if(http.readyState == 4 && http.status == 200) {
                         alert(http.responseText);
-                        if(http.responseText == 'Successfully Deleted Bookmarked Event. Please refresh to continue.'){
+                        if(http.responseText == 'Successfully Deleted Bookmarked Event.'){
                             window.location="Bookmark_Page.php";
                         }
                     }
@@ -38,7 +38,17 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
         <section class="bodyDetails">
         <h1>Bookmarked Event List</h1>
         <?php 
-        getBookmarkedEvent($_SESSION['userID']);
+            if(!empty($_SESSION['userID'])){
+            getBookmarkedEvent($_SESSION['userID']);
+            }
+            else{
+                echo '<script>alert("Please Sign In To Bookmark")</script>';
+                echo <<< HELLO
+            <div class='Noresult'>
+            <h3><a href="../Sign_In/Sign_In.php" >Click Here</a> To Sign In.</h3>
+            </div>
+HELLO;
+            }
         ?>
         </section>
         <?php include "../footer.php" ?>

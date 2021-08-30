@@ -1,12 +1,21 @@
 /* Page Body Styles */
 section.bodyDetails {
-	width:95%;
-	min-width:640px;
-	max-width:960px;
-	margin-left:auto;
-	margin-right:auto;
+    height:85%;
+    width:95%;
+    min-width:640px;
+    max-width:960px;
+    margin-left:auto;
+    margin-right:auto;
 }
-
+.Noresult{
+    color: red;
+    text-align: center;
+    border: 3px solid #212529;
+    margin: auto;
+    width: 100%;
+    height: 50%;
+    padding: 250px;
+}
 /* Column Styles */
 div[class^="col-"] {
     float:left;
@@ -14,32 +23,6 @@ div[class^="col-"] {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-a.editButton {
-    margin-right: 10px;
-    text-decoration: none;
-    padding: 2px 5px;
-    background: #2E8B57;
-    color: white;
-    border-radius: 3px;
-    float: right;
-}
-a.uploadButton {
-    margin-right: 10px;
-    text-decoration: none;
-    padding: 2px 5px;
-    background: #2E8B57;
-    color: white;
-    border-radius: 3px;
-    float: right;
-}
-a.delete{
-    text-decoration: none;
-    padding: 2px 5px;
-    background: #2E8B57;
-    color: white;
-    border-radius: 3px;
-    float: right;
 }
 
 div.col-1-3{
@@ -56,7 +39,10 @@ button.addToCart {
 button#bookmarkButton {
     text-decoration: none;
 }
-
+.enrollNow{
+    border: 3px solid #212529;
+    float: right;
+}
 
 /* Specials Styles */
 .specials {
@@ -74,8 +60,8 @@ div.uploadEdit{
     right: 10px;
 }
 
-a.enrollNow:hover{
-	color: red;
+.enrollNow:hover{
+    color: red;
 }
 div.price{
     margin-right: 10px;
@@ -93,7 +79,6 @@ img.picture {
     min-height: 391px;
     min-width: 263px;
 }
-
 
 /* Footer Styles */
 footer{

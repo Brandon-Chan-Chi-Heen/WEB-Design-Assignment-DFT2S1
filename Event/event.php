@@ -30,9 +30,21 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     <link href="event.css" type="text/css" rel="stylesheet">
     <script>
         function bookmarkEvent(eventTitle, userId) {
-            console.log("Heelo");
             var url = "bookmark.php";
             var params = `eventTitle=${eventTitle}&userID=${userId}`;
+            var http = new XMLHttpRequest();
+
+            http.open("GET", url + "?" + params, true);
+            http.onreadystatechange = function() {
+                if (http.readyState == 4 && http.status == 200) {
+                    alert(http.responseText);
+                }
+            }
+            http.send(null);
+        }
+        function addToCartFunction(userID ,eventTittle,quantity ,price){
+            var url = "addtoCart.php";
+            var params = `eventTitle=${eventTittle}&userID=${userID}&quantity=${quantity}&price=${price}`;
             var http = new XMLHttpRequest();
 
             http.open("GET", url + "?" + params, true);
@@ -50,49 +62,62 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     <?php include "../header.php" ?>
     <?php include "event_helper.php" ?>
     <section class="bodyDetails">
-        <h1>Event List</h1>
-        <?php
-        if(isset($searchResult)){
-            if (!empty($searchResult)) {
-            foreach ($searchResult as $result) {
-                [$eventTitle, $eventDescription, $eventPrice] =  $result;
-                echo <<< HELLO
-                <div class="Event">
-                <div class="col-1-3 specials">
-                    <img src="$eventTitle.jpg" alt="" class="picture" />
-                </div>
-                <div class="col-2-3 specials">
-                    <div class="Details">
-                        <div class="uploadEdit">
-                            <h3>
-HELLO;                              
-                                    if(!empty($_SESSION['userID'])){
-                                        echo "<button onclick='bookmarkEvent(`$eventTitle`,{$_SESSION['userID']} )'>🔖</button>";
-                                    }
-            echo <<< HELLO
-                            </h3>
+        <table class="eventBodyTable">
+            <thead>
+                <h1>Event List</h1>
+            </thead>
+            <tbody >
+                <?php
+                if(isset($searchResult)){
+                    if (!empty($searchResult)) {
+                    foreach ($searchResult as $result) {
+                        [$eventTitle, $eventDescription, $eventPrice] =  $result;
+                        echo <<< HELLO
+                        <div class="Event">
+                        <div class="col-1-3 specials">
+                            <img src="$eventTitle.jpg" alt="" class="picture" />
                         </div>
-                        <h1>$eventTitle</h1>
-                        <p>$eventDescription</p>
-                    </div>
-                    <div class="price">
-                        <h3><button onclick="addToCartFunction()" class="addToCart">🛒</button>$$eventPrice</h3>
-                        <a href="" class="enrollNow">
-                            <h3>Enroll Now</h3>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                        <div class="col-2-3 specials">
+                            <div class="Details">
+                                <div class="uploadEdit">
+                                    <h3>
+HELLO;                              
+                        if(!empty($_SESSION['userID'])){
+                            echo "<button onclick='bookmarkEvent(`$eventTitle`,{$_SESSION['userID']} )'>🔖</button>";
+                        }
+                        echo <<< HELLO
+                                        </h3>
+                                    </div>
+                                    <h1>$eventTitle</h1>
+                                    <p>$eventDescription</p>
+                                </div>
+                                <div class="price">
+                                    <h3><button onclick="addToCartFunction()" class="addToCart">🛒</button>$$eventPrice</h3>
+                                    <a href="" class="enrollNow">
+                                        <h3>Enroll Now</h3>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
 HELLO;
-                }
-            }else{
-                echo "No results found.";
-            }
-        }
-        else {
-            echo getEventDetails();
-        }
-        ?>
+                            }
+                        }
+                        else
+                        {
+                            echo "<script type='text/javascript'>alert(`No result found.`);</script>";
+                            echo <<< HELLO
+                            <div class='Noresult'>
+                            <h3>No Result Found.</h3>
+                            </div>
+HELLO;
+                        }
+                    }
+                    else {
+                        echo getEventDetails();
+                    }
+                    ?>
+            </tbody>
+        </table>
     </section>
     <?php include "../footer.php" ?>
 </body>
