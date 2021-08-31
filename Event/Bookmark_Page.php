@@ -29,14 +29,27 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
                     }
                 }
                 http.send(null);
+            }
+            function addToCartFunction(userID, eventTittle, quantity, price) {
+                var url = "addtoCart.php";
+                var params = `eventTitle=${eventTittle}&userID=${userID}&quantity=${quantity}&price=${price}`;
+                var http = new XMLHttpRequest();
+
+                http.open("GET", url + "?" + params, true);
+                http.onreadystatechange = function () {
+                    if (http.readyState == 4 && http.status == 200) {
+                        alert(http.responseText);
+                    }
                 }
+                http.send(null);
+            }
         </script>
     </head>
     <body class="bg-dark text-white">
         <?php include "../header.php" ?>
         <?php include "event_helper.php" ?>
         <section class="bodyDetails">
-        <h1>Bookmarked Event List</h1>
+        <h1 class="pageTitle">Bookmarked Event List</h1>
         <?php 
             if(!empty($_SESSION['userID'])){
             getBookmarkedEvent($_SESSION['userID']);
@@ -44,14 +57,14 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
             else{
                 echo '<script>alert("Please Sign In To Bookmark")</script>';
                 echo <<< HELLO
-            <div class='Noresult'>
+            <div class='result'>
             <h3><a href="../Sign_In/Sign_In.php" >Click Here</a> To Sign In.</h3>
             </div>
 HELLO;
             }
         ?>
-        </section>
         <?php include "../footer.php" ?>
+        </section>
     </body>
 </html>
 
