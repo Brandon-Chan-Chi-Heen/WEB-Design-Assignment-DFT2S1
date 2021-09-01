@@ -3,6 +3,15 @@ require_once dirname(__FILE__) . "/../env_variables.php";
 require_once "$docRoot/utility/utility.php";
 ?>
 <div id="admin-sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
+    <script>
+        function displaySideBar(buttonObj) {
+            if (buttonObj.classList.contains("onclick")) {
+                buttonObj.classList.remove("onclick");
+            } else {
+                buttonObj.classList.add("onclick");
+            }
+        }
+    </script>
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <h1>Admin Panel</h1>
     </a>
@@ -30,10 +39,6 @@ require_once "$docRoot/utility/utility.php";
                 "list_participants.php" => "List Participants",
                 "add_participant.php" => "Add Participants",
                 // "edit_participant.php" => "Edit Participants",
-            ),
-            'cart' => array(
-                "list_carts.php" => "List carts",
-                "add_cart.php" => "Add cart",
             ),
             'administrator' => array(
                 "list_admins.php" => "List Admins",
@@ -73,7 +78,7 @@ require_once "$docRoot/utility/utility.php";
 
                     echo <<<HTML
                     <li>
-                        <button class="btn btn-primary $activeStatus" style="text-align:left; width:100%;">
+                        <button class="btn btn-primary $activeStatus" style="text-align:left; width:100%;" onclick="displaySideBar(this);">
                         $dir
                         </button>
                         <ul class="nav nav-pills flex-column subSideBar" >
@@ -96,7 +101,7 @@ HTML;
                     }
 
                     echo  <<<HTML
-                    <li >
+                    <li class="container">
                         <a href="$currentPath/$dir" class="nav-link $childActiveStatus">$dirOrFiles</a>
                     </li>
 HTML;
@@ -130,11 +135,11 @@ HTML;
             <img src="<?php echo "$sevRoot/resources/user_icon.png" ?> " alt="user" width="32" height="32" class="rounded-circle mx-2">
         </a>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="<?php echo "$sevRoot/Sign_In/profile.php" ?>">Edit Profile</a></li>
+            <li><a class="dropdown-item" href="<?php echo "$sevRoot/admin/administrator/edit_admin.php?admin_id={$_SESSION['adminID']}" ?>">Edit Profile</a></li>
             <li>
                 <hr class="dropdown-divider">
             </li>
-            <li><a class="dropdown-item" href="<?php echo "$sevRoot/Sign_In/Sign_Out.php" ?> ">Sign out</a></li>
+            <li><a class="dropdown-item" href="<?php echo "$sevRoot/admin/logout.php" ?> ">Sign out</a></li>
         </ul>
     </div>
 </div>

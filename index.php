@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once dirname(__FILE__) . "/env_variables.php";
+require_once "$docRoot/utility/utility.php";
 
 $isLogin = !empty($_SESSION['userID']) ? true : false;
 
@@ -81,29 +82,20 @@ if (isset($_SESSION)) {
             <div class="container">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     <?php
-                    $numberOfItems = 3;
-                    $priceArray = array(18.9, 20, 50);
-                    $quantityArray = array(1, 2, 4);
-                    $totalPriceArray = array();
-                    for ($i = 0; $i < $numberOfItems; $i++) {
-                        array_push($totalPriceArray, $priceArray[$i] * $quantityArray[$i]);
-                    }
+                    $db = new Database();
+                    $col = array("Event_Title", "Event_Description", "Event_Price");
+                    $result = $db->select($col, "", "display_event");
 
-                    for ($i = 0; $i < $numberOfItems; $i++) {
+                    foreach ($result as $row) {
                         echo <<<HTML
                         <div class="col">
                             <div class="card shadow-sm">
-                                <img src="resources/Investhink.jpg" alt="event" />
-
+                                <img src="$sevRoot/Event/{$row[0]}.jpg" alt="event" />
                                 <div class="card-body">
-                                    <p class="card-text text-dark">{$totalPriceArray[$i]}</p>
+                                    <p style="overflow: hidden; text-overflow: ellipsis; max-height: 150px;"  class="card-text text-dark">{$row[1]}</p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-primary">Read more...</button>
-
-                                            <!-- if verified -->
-                                            <!-- <button type="button" class="btn btn-sm btn-primary btn-outline-secondary">Edit</button> -->
-
+                                            <button type="button" class="btn btn-sm btn-primary">Read More...</button>
                                         </div>
                                         <small class="text-muted">9th September</small>
                                     </div>

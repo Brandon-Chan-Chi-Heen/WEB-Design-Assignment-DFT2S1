@@ -6,8 +6,8 @@ include "$docRoot/admin/redirectNonAdmin.php";
 
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['admin_id'])) {
-    $_SESSION["cur_edit_id"] = $_GET['admin_id'];
-} else if (empty($_SESSION['cur_edit_id'])) {
+    $_SESSION["cur_edit_key"] = $_GET['admin_id'];
+} else if (empty($_SESSION['cur_edit_key'])) {
     echo <<<JAVASCRIPT
                 <script>
                     alert(`No record selected, Please select first.
@@ -19,7 +19,7 @@ JAVASCRIPT;
 }
 
 $db = new Database();
-$result = $db->select(array('admin_id', 'first_name', 'last_name'), "admin_id = {$_SESSION['cur_edit_id']}", 'administrator')[0];
+$result = $db->select(array('admin_id', 'first_name', 'last_name'), "admin_id = {$_SESSION['cur_edit_key']}", 'administrator')[0];
 [$adminID, $firstName, $lastName] = $result;
 
 function validationCheck($changeArray, $colName)
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $whereStatement = "admin_id = {$_SESSION['cur_edit_id']}";
+        $whereStatement = "admin_id = {$_SESSION['cur_edit_key']}";
 
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
@@ -105,9 +105,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         if ($changeArray['admin_id']["updated_status"]) {
-            $_SESSION['cur_edit_id'] = $adminID;
+            $_SESSION['cur_edit_key'] = $adminID;
         }
-        $result = $db->select(array('admin_id', 'first_name', 'last_name'), "admin_id = {$_SESSION['cur_edit_id']}", 'administrator')[0];
+        $result = $db->select(array('admin_id', 'first_name', 'last_name'), "admin_id = {$_SESSION['cur_edit_key']}", 'administrator')[0];
         [$adminID, $firstName, $lastName] = $result;
         $db->disconnect();
     }

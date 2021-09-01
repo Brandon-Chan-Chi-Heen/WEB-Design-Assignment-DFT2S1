@@ -27,8 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         }
     }
 
-    // consoleLog($name, $fileExt);
-    // die();
     $fp = fopen($name, 'rb');
 
     header("Content-Type: image/$fileExt");

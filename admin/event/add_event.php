@@ -6,6 +6,9 @@ include "$docRoot/admin/redirectNonAdmin.php";
 
 $db = new Database();
 
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
         // data validation
@@ -24,7 +27,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validEventTitle = true;
         }
 
-        if (!empty($eventDescription) && preg_match($regExp, $eventDescription)) {
+        if (isset($_FILES)) {
+            $file = $_FILES['file'];
+            $fileErr = '';
+
+            if ($file['error'] > 0) {
+                switch ($file['error']) {
+                    case UPLOAD_ERR_NO_FILE: // Code = 4.
+                        // ignore and don't update
+                        break;
+                    case UPLOAD_ERR_FORM_SIZE: // Code = 2.
+                        $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
+                        break;
+                    default: // Other codes.
+                        $fileErr = 'There was an error while uploading the file.';
+                        break;
+                }
+            } else if ($file['size'] > 1048576) {
+                // Check the file size. Prevent hacks.
+                // 1MB = 1024KB = 1048576B.
+                $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
+            } else {
+                $ext = strtoupper(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+                if (
+                    $ext != 'JPG'  &&
+                    $ext != 'JPEG' &&
+                    $ext != 'GIF'  &&
+                    $ext != 'PNG'
+                ) {
+                    $fileErr = 'Only JPG, GIF and PNG format are allowed.';
+                } else {
+                    $save_as = $eventTitle . '.' . $ext;
+                    move_uploaded_file($file['tmp_name'], "$docRoot/Event/" . $save_as);
+                }
+            }
+        }
+
+        if (!empty($eventDescription)) {
             $validEventDescription = true;
         }
 
@@ -43,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($validData) {
             try {
                 $db->insert(
-                    array("Event_Title", "Event_Description", "price"),
+                    array("Event_Title", "Event_Description", "Event_Price"),
                     array($eventTitle, $eventDescription, $price),
                     "display_event"
                 );
@@ -97,12 +137,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <h1>Add Event</h1>
 
-        <form class="g-3 needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" novalidate>
+        <form class="g-3 needs-validation" action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data" novalidate>
+            <div class="rounded-circle g-0 my-3" id="fileInputDiv">
+                <input type="file" class="<?php if (!empty($fileErr)) echo "is-invalid"; ?>" name="file" id="fileID" accept=".gif, .jpg, .jpeg, .png" required />
+                <div class="invalid-feedback">
+                    <?php
+                    if (!empty($fileErr)) {
+                        echo $fileErr;
+                    } else {
+                        echo "Please Provide a Picture";
+                    }
+                    ?>
+                </div>
+            </div>
 
 
             <div class="col-md-3 mb-3">
                 <label for="eventTitleInput" class="form-label">Event Title</label>
-                <input name="eventTitle" type="text" class="form-control<?php if (isset($validEventTitle) && !$validEventTitle) echo " is-invalid"; ?>" pattern="^[a-zA-Z\s]*$" id="eventTitleInput" value="<?php if (isset($eventTitle)) echo $eventTitle; ?>" placeholder="Event Title">
+                <input name="eventTitle" type="text" class="form-control<?php if (isset($validEventTitle) && !$validEventTitle) echo " is-invalid"; ?>" id="eventTitleInput" value="<?php if (isset($eventTitle)) echo $eventTitle; ?>" placeholder="Event Title">
                 <div class="invalid-feedback">
                     Please Enter a proper Event Title
                 </div>
@@ -112,10 +164,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="eventDescriptionInput" class="form-label">Event Title</label>
-                <textarea name="eventDescription" type="text" class="form-control<?php if (isset($validEventTitle) && !$validEventTitle) echo " is-invalid"; ?>" pattern="^[a-zA-Z\s]*$" id="eventDescriptionInput" rows="10" cols="100" value="<?php if (isset($eventTitle)) echo $eventTitle; ?>" placeholder="Event Description"></textarea>
+                <label for="eventDescriptionInput" class="form-label">Event Description</label>
+                <textarea name="eventDescription" type="text" class="form-control<?php if (isset($validEventDescription) && !$validEventDescription) echo " is-invalid"; ?>" pattern="^[a-zA-Z\s]*$" id="eventDescriptionInput" rows="10" cols="100" value="<?php if (isset($eventDescription)) echo $eventDescription; ?>" placeholder="Event Description"></textarea>
                 <div class="invalid-feedback">
-                    Please Enter a proper Event Title
+                    Please Enter a proper Event Description
                 </div>
                 <div class="valid-feedback">
                     Looks good!
@@ -138,9 +190,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo <<<HTML
                     <div class="col-md-5 text-success">
                     <h1>
-                        Record Added
+                        Successfully Added Record.
                     </h1>
                     </div>
+HTML;
+            }
+            ?>
+
+            <?php
+            if (isset($duplicateEvent) && $duplicateEvent) {
+                echo <<<HTML
+                        <div class="text-danger">
+                            <h1>
+                                Event Already Exists!
+                            </h1>
+                        </div>
 HTML;
             }
             ?>
@@ -150,7 +214,7 @@ HTML;
                 <?php
                 if (isset($insertSuccess) && $insertSuccess) {
                     echo <<<HTML
-                        <a class="btn btn-primary" href="list_user.php">Return</a>
+                        <a class="btn btn-primary" href="list_events.php">Return</a>
 HTML;
                 }
                 ?>
@@ -158,14 +222,42 @@ HTML;
         </form>
 
         <script>
+            let removeClass = (element, first) => {
+                if (element.classList.contains(first)) {
+                    element.classList.remove(first)
+                }
+            }
+
+            let addClass = (element, first) => {
+                if (!element.classList.contains(first)) {
+                    element.classList.add(first)
+                }
+            }
+
             (function() {
                 'use strict'
 
                 let form = document.getElementsByClassName('needs-validation')[0];
+                let eventTitle = document.getElementById('eventTitleInput');
+                let eventDescription = document.getElementById('eventDescriptionInput');
 
                 console.log(form);
                 form.addEventListener('submit', function(event) {
+                    if (eventTitle.value == '') {
+                        eventTitle.setCustomValidity("Invalid Field");
+                        addClass(eventTitle, "is-invalid");
+                    } else {
+                        eventTitle.setCustomValidity("");
+                        removeClass(eventTitle, "is-invalid");
+                    }
 
+                    if (eventDescription.value == '') {
+                        eventDescription.setCustomValidity("Invalid Field");
+                        addClass(eventDescription, "is-invalid");
+                    } else {
+                        eventDescription.setCustomValidity("");
+                        removeClass(eventDescription, "is-invalid");
+                    }
                     if (!form.checkValidity()) {
                         event.preventDefault()
                         event.stopPropagation()

@@ -169,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </h1>
                     </div>
 HTML;
-            } else if ($duplicateRecord) {
+            } else if (isset($duplicateRecord) && $duplicateRecord) {
                 echo <<<HTML
                     <div class="col-md-12 text-danger">
                     <h1>
@@ -185,7 +185,7 @@ HTML;
                 <?php
                 if (isset($insertSuccess) && $insertSuccess) {
                     echo <<<HTML
-                        <a class="btn btn-primary" href="list_user.php">Return</a>
+                        <a class="btn btn-primary" href="list_bookmarks.php">Return</a>
 HTML;
                 }
                 ?>

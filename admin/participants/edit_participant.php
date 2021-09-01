@@ -1,25 +1,30 @@
 <?php
 session_start();
+
+// ===========================================================
+//      PENDING UPDATE, NOT NEEDED AS OF NOW
+// 
+// =================================
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
 include "$docRoot/admin/redirectNonAdmin.php";
 
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['user_id'])) {
-    $_SESSION["cur_edit_id"] = $_GET['user_id'];
-} else if (empty($_SESSION['cur_edit_id'])) {
+    $_SESSION["cur_edit_key"] = $_GET['user_id'];
+} else if (empty($_SESSION['cur_edit_key'])) {
     echo <<<JAVASCRIPT
                 <script>
                     alert(`No record selected, Please select first.
                          Enter To Continue`); 
-                    window.location='list_user.php';
+                    window.location='list_bookmarks.php';
                 </script>
 JAVASCRIPT;
     die();
 }
 
 $db = new Database();
-$result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+$result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_key']}", 'user')[0];
 [$firstName, $lastName, $email, $gender] = $result;
 
 function validationCheck($changeArray, $colName)
@@ -49,121 +54,65 @@ function initChangeArray(&$changeArray, $colList)
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
-    $file = $_FILES['file'];
-    $fileErr = '';
-
-    if ($file['error'] > 0) {
-        switch ($file['error']) {
-            case UPLOAD_ERR_NO_FILE: // Code = 4.
-                // ignore and don't update
-                break;
-            case UPLOAD_ERR_FORM_SIZE: // Code = 2.
-                $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
-                break;
-            default: // Other codes.
-                $fileErr = 'There was an error while uploading the file.';
-                break;
+function deepIntersect($arr1, $arr2)
+{
+    return array_uintersect(
+        $arr1,
+        $arr2,
+        function ($val1, $val2) {
+            return strcmp($val1[0], $val2[0]);
         }
-    } else if ($file['size'] > 1048576) {
-        // Check the file size. Prevent hacks.
-        // 1MB = 1024KB = 1048576B.
-        $fileErr = 'File uploaded is too large. Maximum 1MB allowed.';
-    } else {
-        $ext = strtoupper(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        if (
-            $ext != 'JPG'  &&
-            $ext != 'JPEG' &&
-            $ext != 'GIF'  &&
-            $ext != 'PNG'
-        ) {
-            $fileErr = 'Only JPG, GIF and PNG format are allowed.';
-        } else {
-            $save_as = $_SESSION['cur_edit_id'] . '.' . $ext;
-
-            // delete any existing img with the same name but different ext
-
-            $oldFile = glob("$docRoot/resources/{$_SESSION["cur_edit_id"]}.*")[0];
-            unlink($oldFile);
-            move_uploaded_file($file['tmp_name'], "$docRoot/resources/" . $save_as);
-        }
-    }
+    );
 }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
         $changeArray = array();
         initChangeArray($changeArray, array(
-            "first_name", "last_name", "email", "password"
+            "user_id", "Event_Title", "quantity"
         ));
-        $changeArray["password"]["empty_pass"] = true;
-        $changeArray["password"]["same_pass"] = false;
 
-        $firstName = isset($_POST['firstName']) ? $_POST['firstName'] : '';
-        $lastName = isset($_POST['lastName']) ? $_POST['lastName'] : '';
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
-        $password = isset($_POST['password']) ? $_POST['password'] : '';
-        $confirmPassword = isset($_POST['confirmPassword']) ? $_POST['confirmPassword'] : '';
 
-        $regExp = "/^[a-zA-Z\s]*$/";
+        $userID = !empty($_POST["userID"]) ? $_POST["userID"] : '';
+        $eventTitle = !empty($_POST["eventTitle"]) ? $_POST["eventTitle"] : '';
+        $quantity = !empty($_POST["quantity"]) ? $_POST["quantity"] : '';
 
-        if (!empty($firstName)) {
-            $changeArray["first_name"]["change_status"] = true;
-            if (preg_match($regExp, $firstName)) {
-                $changeArray["first_name"]["value"] = $firstName;
+        $regExp = "/^\d*$/";
+
+        if (!empty($userID) && preg_match($regExp, $userID)) {
+            $changeArray["user_id"]["change_status"] = true;
+            if (deepIntersect(array(array($userID)), $userIDArray) == array(array($userID))) {
+                $changeArray["user_id"]["value"] = $userID;
             }
         }
 
-        if (!empty($lastName)) {
-            $changeArray["last_name"]["change_status"] = true;
-            if (preg_match($regExp, $lastName)) {
-                $changeArray["last_name"]["value"] = $lastName;
+        if (!empty($quantity)) {
+            $changeArray["quantity"]["change_status"] = true;
+            if (preg_match($regExp, $quantity)) {
+                $changeArray["user_id"]["value"] = $quantity;
             }
         }
 
-        $regExp = "/^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/";
-        if (!empty($email)) {
-            $changeArray["email"]["change_status"] = true;
-            if (preg_match($regExp, $email)) {
-                $changeArray["email"]["value"] = $email;
+        if (!empty($eventTitle)) {
+            $changeArray["Event_Title"]["change_status"] = true;
+            if (deepIntersect(array(array($eventTitle)), $eventTitleArray) == array(array($eventTitle))) {
+                $changeArray["Event_Title"]["value"] = $eventTitle;
             }
         }
 
-        if (!empty($gender)) {
-            $changeArray["gender"]["change_status"] = true;
-            if ($gender == "M" || $gender == "F" || $gender == "O") {
-                $changeArray["gender"]["value"] = $gender;
-            }
-        }
-
-        //either password is empty, check failed
-        if (!empty($password) || !empty($confirmPassword)) {
-            $changeArray["password"]["change_status"] = true;
-            if (!empty($password) && !empty($confirmPassword)) {
-                $changeArray["password"]["empty_pass"] = false;
-                if ($password == $confirmPassword) {
-                    $changeArray["password"]["same_pass"] = true;
-                    $changeArray["password"]["value"] = $password;
-                }
-            }
-        }
-
-        $whereStatement = "user_id = {$_SESSION['cur_edit_id']}";
+        $whereStatement = "user_id = {$_SESSION['cur_edit_key']}";
 
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
-                $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'user');
+                $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'bookmarks');
             }
         }
-        $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+        $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_key']}", 'user')[0];
         [$firstName, $lastName, $email, $gender] = $result;
         $db->disconnect();
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -187,141 +136,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <section class="text-white">
 
-        <h1>Edit User</h1>
-        <img src="<?php echo "$sevRoot/utility/getImage.php?user_id={$_SESSION["cur_edit_id"]}" ?>" height="200" width="200" style="object-fit:cover;" alt="">
+        <h1>Edit Bookmark</h1>
 
         <form class="g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data" novalidate>
-            <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_id"])) echo $_SESSION["cur_edit_id"]; ?>">
-            <div class="rounded-circle g-0 my-3" id="fileInputDiv">
-                <input type="file" class="<?php if (!empty($fileErr)) echo "is-invalid"; ?>" name="file" id="fileID" accept=".gif, .jpg, .jpeg, .png" />
+            <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_key"])) echo $_SESSION["cur_edit_key"]; ?>">
+
+            <div class="col-md-3 mb-3">
+                <label for="userIDInput" class="form-label">User ID</label>
+                <input name="userID" type="number" class="form-control<?php if (isset($validUserID) && !$validUserID) echo " is-invalid"; ?>" id="userIDInput" value="<?php if (isset($userID)) echo $userID; ?>" placeholder="1" required>
                 <div class="invalid-feedback">
+                    Parent Key User ID Does Not Exist, Please Check Again
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="eventTitleInput" class="form-label">Event Title</label>
+                <input name="eventTitle" class="form-control<?php if (isset($validEventTitle) && !$validEventTitle) echo " is-invalid"; ?>" list="eventTitleOptions" id="eventTitleInput" value="<?php if (isset($eventTitle)) echo $eventTitle; ?>" placeholder="Type to search...">
+                <datalist id="eventTitleOptions">
                     <?php
-                    if (!empty($fileErr)) {
-                        echo $fileErr;
+                    if (is_array($eventTitleArray) && !empty($eventTitleArray)) {
+                        foreach ($eventTitleArray as $titles) {
+                            echo "<option value='{$titles[0]}'>";
+                        }
                     }
                     ?>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label for="firstNameInput" class="form-label">First Name</label>
-                <input name="firstName" type="text" class="form-control " id="firstNameInput" placeholder="<?php if (isset($firstName)) echo $firstName; ?>" required>
+                </datalist>
                 <div class="invalid-feedback">
-                    Please Enter a valid First name
+                    Please Select A proper Event Title
                 </div>
                 <div class="valid-feedback">
-                    Changed!
+                    Looks good!
                 </div>
             </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="lastNameInput" class="form-label">Last Name</label>
-                <input name="lastName" type="text" class="form-control" id="lastNameInput" pattern="^[a-zA-Z\s]*$" placeholder="<?php if (isset($lastName)) echo $lastName; ?>" required>
+            <div class="col-md-3 mb-3">
+                <label for="quantityInput" class="form-label">Quantity</label>
+                <input name="quantity" type="number" class="form-control" id="quantityInput" value="<?php if (isset($quantity)) echo $quantity; ?>" placeholder="1" required>
                 <div class="invalid-feedback">
-                    Please enter a valid Last Name
+                    Please Enter a valid quantity
                 </div>
                 <div class="valid-feedback">
-                    Changed!
-                </div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label for="emailInput" class="form-label">Email address</label>
-                <input name="email" type="email" class="form-control" id="emailInput" pattern="^[a-zA-Z0-9.!#\/$%&'*+=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" placeholder="<?php if (isset($email)) echo $email; ?>" required>
-                <?php
-                if (isset($changeArray)) {
-                    if ($changeArray["email"]["change_status"]) {
-                        echo '<div class="invalid-feedback">';
-
-                        // check if value is empty, if its empty it failed the validation check
-                        if (!empty($changeArray["email"]["value"])) {
-
-                            // check if it succesfully updated the database
-                            if (!$changeArray["email"]["updated_status"]) {
-                                echo 'Email Exists in Database, Please Choose Another Email';
-                            }
-                        } else {
-                            echo 'Please enter a valid email';
-                        }
-
-                        echo '</div>';
-                    }
-                }
-                ?>
-                <div class="valid-feedback">
-                    Changed!
-                </div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label for="genderSelect" class="form-label">Gender</label>
-                <select name="gender" id="genderSelect" class="form-select" required>
-                    <option value="" <?php if (isset($gender)  && $gender == "") echo "selected"; ?> disabled hidden>Select Gender</option>
-                    <option <?php
-                            if (isset($gender)  && $gender == "M") {
-                                echo "value = '' selected";
-                            } else {
-                                echo "value = 'M'";
-                            }
-                            ?>>
-                        Male
-                    </option>
-                    <option <?php
-                            if (isset($gender)  && $gender == "F") {
-                                echo "value = '' selected";
-                            } else {
-                                echo "value = 'F'";
-                            }
-                            ?>>
-                        Female
-                    </option>
-                    <option <?php
-                            if (isset($gender)  && $gender == "O") {
-                                echo "value = '' selected";
-                            } else {
-                                echo "value = 'O'";
-                            }
-                            ?>>
-                        Other
-                    </option>
-                </select>
-                <div class="invalid-feedback">
-                    Please select your gender
-                </div>
-                <div class="valid-feedback">
-                    Changed!
-                </div>
-            </div>
-
-            <div class="col-md-8 row g-0 mb-3 pt-3">
-                <div class="col-md-6 mb-3 ">
-                    <label for="passwordInput">Password</label>
-                    <input name="password" type="password" class="form-control m-0" id="passwordInput" placeholder="Password" required>
-                </div>
-                <div id="passwordErrorWrapper" class="col-md-6 mb-3 px-2">
-                    <label for="confirmPasswordInput">Confirm Password</label>
-                    <input name="confirmPassword" type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
-                </div>
-                <?php
-                if (isset($changeArray)) {
-                    if ($changeArray["password"]["change_status"]) {
-                        echo '<div class="invalid-feedback col-md-12 px-2 text-center">';
-                        // check if value is empty, if its empty it failed the validation check
-                        // check if it succesfully updated the database
-                        if ($changeArray["password"]["empty_pass"]) {
-                            echo 'Password Cannot Be Empty';
-                        } else if (!$changeArray["password"]["same_pass"]) {
-                            if (!$changeArray["password"]["updated_status"]) {
-                                echo  'Password is not the same';
-                            }
-                        }
-                        echo '</div>';
-                    }
-                }
-                ?>
-
-                <div class="valid-feedback col-md-12 px-2  text-center">
-                    Changed!
+                    Looks good!
                 </div>
             </div>
 

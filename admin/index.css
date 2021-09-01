@@ -32,9 +32,34 @@ section {
 
 .subSideBar {
   margin-left: 20px;
+  max-height: 0;
+  overflow: hidden;
 }
 
 a.white-anchor {
   text-decoration: none;
   color: white;
+}
+
+@keyframes slide {
+  from {
+    max-height: 0%;
+  }
+  to {
+    max-height: 100%;
+  }
+}
+
+.container {
+  padding: 0px;
+}
+
+button.active + ul.subSideBar {
+  overflow: hidden;
+  animation: slide 0.5s ease-in-out 0.5s forwards;
+}
+
+button.onclick + ul.subSideBar {
+  overflow: hidden;
+  animation: slide ease-in-out 0.5s forwards;
 }

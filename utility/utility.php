@@ -15,20 +15,11 @@ function concatPaths(...$paths)
 
 function consoleLog(...$args)
 {
-    if (end($args) == "\"") {
-        $stringQuotes = "\"";
-        array_pop($args);
-    } else if (end($args) == "'") {
-        $stringQuotes = "'";
-        array_pop($args);
-    } else {
-        $stringQuotes = "`";
-    }
 
-    $echoedString = "<script>console.log(" . $stringQuotes . array_shift($args) . $stringQuotes;
+    $echoedString = "<script>console.log( \""  . array_shift($args) . "\"";
 
     foreach ($args as $strings) {
-        $echoedString .= ", $stringQuotes" . $strings . $stringQuotes;
+        $echoedString .= ", \""   . htmlspecialchars($strings, ENT_QUOTES) . "\"";
     }
 
     $echoedString .= ");</script>";
@@ -168,7 +159,7 @@ class Database
         mysqli_close($this->con);
     }
 
-    function select($columnArray, $whereStatements, $table = 'user', $fetchAll = true)
+    function select($columnArray, $whereStatements, $table = 'user')
     {
         if (array_intersect($columnArray, self::tableColNames[$table]) != $columnArray && $columnArray[0] != "*") {
             consoleLog("Invalid column name");
@@ -242,9 +233,10 @@ class Database
             $queryStatement .= "{$columnArray[$i]} = '{$values[$i]}', ";
         }
         $queryStatement = rtrim($queryStatement, ", ");
-
         $queryStatement .= " WHERE $whereStatement;";
+
         $this->queryResult = mysqli_query($this->con, $queryStatement);
+        consoleLog(mysqli_errno($this->con), mysqli_error($this->con));
         if ($this->queryResult) {
             return true;
         }

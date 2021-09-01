@@ -4,7 +4,7 @@ require_once "$docRoot/utility/utility.php";
 
 function unsetEditSessions()
 {
-    $_SESSION["cur_edit_id"] = "";
+    $_SESSION["cur_edit_key"] = "";
 }
 function setAdminSession($adminID)
 {

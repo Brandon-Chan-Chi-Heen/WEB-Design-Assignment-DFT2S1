@@ -19,7 +19,7 @@
                       <td>
 HTML;           
                 if(!empty($userID)){
-                    echo "<button onclick='removeCart($userID,`$eventTitle`)'>Remove</button>";
+                    echo "<button onclick=`removeCart($userID,$eventTitle)`>X</button>";
                 }
                 echo <<< HTML
                       </td>

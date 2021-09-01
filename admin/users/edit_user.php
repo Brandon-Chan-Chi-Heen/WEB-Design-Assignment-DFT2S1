@@ -6,8 +6,8 @@ include "$docRoot/admin/redirectNonAdmin.php";
 
 
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['user_id'])) {
-    $_SESSION["cur_edit_id"] = $_GET['user_id'];
-} else if (empty($_SESSION['cur_edit_id'])) {
+    $_SESSION["cur_edit_key"] = $_GET['user_id'];
+} else if (empty($_SESSION['cur_edit_key'])) {
     echo <<<JAVASCRIPT
                 <script>
                     alert(`No record selected, Please select first.
@@ -19,7 +19,10 @@ JAVASCRIPT;
 }
 
 $db = new Database();
-$result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+// if not empty get["sort"]
+
+
+$result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_key']}", 'user')[0];
 [$firstName, $lastName, $email, $gender] = $result;
 
 function validationCheck($changeArray, $colName)
@@ -80,11 +83,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
         ) {
             $fileErr = 'Only JPG, GIF and PNG format are allowed.';
         } else {
-            $save_as = $_SESSION['cur_edit_id'] . '.' . $ext;
+            $save_as = $_SESSION['cur_edit_key'] . '.' . $ext;
 
             // delete any existing img with the same name but different ext
 
-            $oldFile = glob("$docRoot/resources/{$_SESSION["cur_edit_id"]}.*")[0];
+            $oldFile = glob("$docRoot/resources/{$_SESSION["cur_edit_key"]}.*")[0];
             unlink($oldFile);
             move_uploaded_file($file['tmp_name'], "$docRoot/resources/" . $save_as);
         }
@@ -149,14 +152,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $whereStatement = "user_id = {$_SESSION['cur_edit_id']}";
+        $whereStatement = "user_id = {$_SESSION['cur_edit_key']}";
 
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
                 $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'user');
             }
         }
-        $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_id']}", 'user')[0];
+        $result = $db->select(array('first_name', 'last_name', 'email', 'gender'), "user_id = {$_SESSION['cur_edit_key']}", 'user')[0];
         [$firstName, $lastName, $email, $gender] = $result;
         $db->disconnect();
     }
@@ -188,10 +191,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <section class="text-white">
 
         <h1>Edit User</h1>
-        <img src="<?php echo "$sevRoot/utility/getImage.php?user_id={$_SESSION["cur_edit_id"]}" ?>" height="200" width="200" style="object-fit:cover;" alt="">
+        <img src="<?php echo "$sevRoot/utility/getImage.php?user_id={$_SESSION["cur_edit_key"]}" ?>" height="200" width="200" style="object-fit:cover;" alt="">
 
         <form class="g-3 needs-validation " action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST" enctype="multipart/form-data" novalidate>
-            <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_id"])) echo $_SESSION["cur_edit_id"]; ?>">
+            <input type="hidden" id="user_id" name="user_id" value="<?php if (isset($_SESSION["cur_edit_key"])) echo $_SESSION["cur_edit_key"]; ?>">
             <div class="rounded-circle g-0 my-3" id="fileInputDiv">
                 <input type="file" class="<?php if (!empty($fileErr)) echo "is-invalid"; ?>" name="file" id="fileID" accept=".gif, .jpg, .jpeg, .png" />
                 <div class="invalid-feedback">

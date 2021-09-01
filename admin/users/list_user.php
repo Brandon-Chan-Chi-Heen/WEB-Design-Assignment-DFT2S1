@@ -163,7 +163,8 @@ $pageCount = ceil(count($resultArr) / 10);
 
         <table class="event-list">
             <tr class="text-center">
-                <th style="width:10%;">User Id</th>
+                <th style="width:10%;">User ID
+                </th>
                 <th style="width:40%; text-align:left;">Email</th>
                 <th style="width:15%;">First Name</th>
                 <th style="width:15%;">Last Name</th>

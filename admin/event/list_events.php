@@ -38,9 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['pageNo'])) {
         }
 
         $queryStatement = <<<SQL
-        DELETE FROM bookmarks
+        DELETE FROM display_event
         WHERE 
-        Event_Title = $eventTitle;
+        Event_Title = '$eventTitle';
 SQL;
 
         $deleteStatus = $db->con->query($queryStatement) ? true : false;
@@ -94,7 +94,7 @@ $pageCount = ceil(count($resultArr) / 10);
     ?>
 
     <div class="modal" tabindex="-1" id="myModal">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title text-center text-danger ms-3">CONFIRM DELETE RECORD?</h1>
@@ -147,16 +147,16 @@ $pageCount = ceil(count($resultArr) / 10);
 
             $startIndex = ($pageNo - 1) * 10;
             for ($i = $startIndex; $i < $startIndex + 10 && $i < count($resultArr); $i++) {
+                $escapedDescription = htmlspecialchars($resultArr[$i][1], ENT_QUOTES);
                 echo <<<HTML
                     <tr class="text-center">
                         <td>{$resultArr[$i][0]}</td>
                         <td  style="text-align:left;">{$resultArr[$i][1]}</td>
                         <td>{$resultArr[$i][2]}</td>
                         <td>
-                            <button onclick="toRedirect({$resultArr[$i][0]}, 'edit_event.php')" class="btn btn-primary">Edit</button>
-                            <button class="btn btn-danger" onclick="enableModal([{$resultArr[$i][0]}, '{$resultArr[$i][1]}', '{$resultArr[$i][2]}']);">Delete</button>
+                            <button onclick="toRedirect('{$resultArr[$i][0]}', 'edit_event.php')" class="btn btn-primary">Edit</button>
+                            <button class="btn btn-danger" onclick="enableModal(['{$resultArr[$i][0]}', `{$escapedDescription}`, {$resultArr[$i][2]}]);">Delete</button>
                         </td>
-
                     </tr>
 HTML;
             }
@@ -194,6 +194,7 @@ HTML;
         echo '</div>';
         ?>
     </section>
+
 
 
 
