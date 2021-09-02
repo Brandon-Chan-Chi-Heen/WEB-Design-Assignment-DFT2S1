@@ -98,7 +98,7 @@ $isLogin = !empty($_SESSION['userID']) ? true : false;
           </tr>
         </thead>
         <tbody>
-          <?php echo cartBodyHelper($_SESSION['userID']); ?>
+          <?php echo cartBodyHelper($_SESSION['userID'])?>
         </tbody>
       </table>
     </div>

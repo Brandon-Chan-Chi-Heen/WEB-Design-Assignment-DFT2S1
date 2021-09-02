@@ -11,7 +11,7 @@
             while ($row = $result->fetch_object()) {
                 $eventTitle = $row->Event_Title;
                 $quantity = $row->quantity;
-                $eventPrice = $row->event_price;
+                $eventPrice = $row->price;
                 $totalEventPrice = $eventPrice * $quantity;
                 $subtotal = $subtotal + $totalEventPrice;
                 echo <<< HTML
@@ -19,7 +19,7 @@
                       <td>
 HTML;           
                 if(!empty($userID)){
-                    echo "<button onclick=`removeCart($userID,$eventTitle)`>X</button>";
+                    echo "<button onclick='removeCart($userID,\"$eventTitle\")'>X</button>";
                 }
                 echo <<< HTML
                       </td>
