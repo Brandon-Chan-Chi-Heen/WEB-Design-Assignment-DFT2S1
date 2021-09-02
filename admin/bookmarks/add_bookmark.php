@@ -15,11 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // could change all variables to be part of an array, 
         $userID = !empty($_POST["userID"]) ? $_POST["userID"] : '';
         $eventTitle = !empty($_POST["eventTitle"]) ? $_POST["eventTitle"] : '';
-        $quantity = !empty($_POST["quantity"]) ? $_POST["quantity"] : '';
 
         $regExp = "/^\d*$/";
         $validUserID = false;
-        $validQuantity = false;
         $validEventTitle = false;
 
         function deepIntersect($arr1, $arr2)
@@ -38,17 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        if (!empty($quantity) && preg_match($regExp, $quantity)) {
-            $validQuantity = true;
-        }
-
 
         // EventTitle array is 2 levels deep, need to nest another array for comparison
         if (deepIntersect(array(array($eventTitle)), $eventTitleArray) == array(array($eventTitle))) {
             $validEventTitle = true;
         }
 
-        $validData = $validUserID && $validQuantity && $validEventTitle;
+        $validData = $validUserID && $validEventTitle;
 
         // attempt to register
         // error upon same email
@@ -60,8 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($validData) {
             try {
                 $db->insert(
-                    array("user_id", "Event_Title", "quantity"),
-                    array($userID, $eventTitle, $quantity),
+                    array("user_id", "Event_Title"),
+                    array($userID, $eventTitle),
                     "bookmarks"
                 );
                 $insertSuccess = true;
@@ -84,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($insertSuccess) {
             $userID = '';
             $eventTitle = '';
-            $quantity = '';
         }
     }
 }
@@ -102,7 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
-    <link href="user.css" type="text/css" rel="stylesheet">
 </head>
 
 <body class="bg-dark">
@@ -146,18 +138,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     Looks good!
                 </div>
             </div>
-
-            <div class="col-md-3 mb-3">
-                <label for="quantityInput" class="form-label">Quantity</label>
-                <input name="quantity" type="number" class="form-control" id="quantityInput" value="<?php if (isset($quantity)) echo $quantity; ?>" placeholder="1" required>
-                <div class="invalid-feedback">
-                    Please Enter a valid quantity
-                </div>
-                <div class="valid-feedback">
-                    Looks good!
-                </div>
-            </div>
-
 
 
             <?php

@@ -101,9 +101,9 @@ function processLogin($email, $password)
 class Database
 {
     private const DB_HOST = 'localhost';
-    private const DB_PASSWORD = '';
-    private const DB_USER = 'root';
-    private const DB_NAME = 'assignment';
+    private const DB_PASSWORD = 'E_0%0W4~P~|Oi7Vz';
+    private const DB_USER = 'id17525283_admin';
+    private const DB_NAME = 'id17525283_assignment';
 
     public $con;
     public $queryResult;
@@ -116,9 +116,9 @@ class Database
             "last_name"
         ),
         "bookmarks" => array(
+            "bookmark_id",
             "user_id",
             "Event_Title",
-            "quantity"
         ),
         "user" => array(
             "user_id",
@@ -134,6 +134,7 @@ class Database
             "Event_Price"
         ),
         "participants" => array(
+            "participant_id",
             "user_id",
             "last_name",
             "first_name",
@@ -197,7 +198,7 @@ class Database
         // did not make a validation for that
         if (array_intersect($columnArray, self::tableColNames[$table]) != $columnArray) {
             consoleLog("Invalid column name");
-            return null;
+            throw new Exception("Invalid Col Name", "1");
         }
 
         $queryStatement = "INSERT INTO $table (" . array_shift($columnArray);
@@ -217,6 +218,7 @@ class Database
         if (!empty($this->con->errno)) {
             throw new Exception(mysqli_error($this->con), mysqli_errno($this->con));
         }
+        return $this->queryResult;
         consoleLog($this->queryResult);
     }
 
