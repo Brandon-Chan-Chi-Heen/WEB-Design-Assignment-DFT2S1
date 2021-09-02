@@ -3,13 +3,26 @@ session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
 include "../admin_utility.php";
+require_once "$docRoot/utility/search.php";
 include "$docRoot/admin/redirectNonAdmin.php";
 
 
 unsetEditSessions();
 
+// search
+$searchSuccess = false;
+$sorted = false;
+
+$colArray = array(
+    "Event_Title" => "Event Title",
+    "Event_Description" => "Event Description",
+    "Event_Price" => "Event Price"
+);
+$sortCol = "Event_Title";
+$sort = "ASC";
 $db = new Database();
-$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), "", "display_event");
+$whereStatement = "";
+$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), $whereStatement, "display_event");
 
 $pageCount = ceil(count($result) / 10);
 $pageNo = 1;
@@ -21,12 +34,40 @@ $pageNo = 1;
 //     }
 // }
 
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['pageNo'])) {
-    if ($_GET['pageNo'] >= 1 && $_GET['pageNo'] <= $pageCount) {
-        $pageNo = $_GET['pageNo'];
-    } else {
-        header("Location: $sevRoot/admin/users/list_events.php");
-        die();
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    if (isset($_GET['pageNo'])) {
+        if ($_GET['pageNo'] >= 1 && $_GET['pageNo'] <= $pageCount) {
+            $pageNo = $_GET['pageNo'];
+        } else {
+            echo "<script>window.location='$sevRoot/admin/users/list_events.php';</script>";
+            die();
+        }
+    }
+    if (!empty($_GET['col']) && !empty($_GET['sort'])) {
+        if (array_key_exists($_GET['col'], $colArray)) {
+            $sortCol = $_GET['col'];
+        } else {
+            $sortCol = $colArray[0];
+        }
+
+        $sort = ($_GET['sort'] == "ASC") ? "DESC" : "ASC";
+        // search
+        $sorted = true;
+    }
+    // search
+    if (!empty($_GET['search']) && !empty($_GET['col_search'])) {
+        $searchTerm = $_GET['search'];
+        if (array_key_exists($_GET['col_search'], $colArray)) {
+            $searchCol = $_GET['col_search'];
+        } else {
+            $searchCol = $colArray[0];
+        }
+        if ($sorted) {
+            $resultArr = search($searchTerm, array("Event_Title", "Event_Description", "Event_Price"), array($searchCol), "display_event", $sortCol, $sort);
+        } else {
+            $resultArr = search($searchTerm, array("Event_Title", "Event_Description", "Event_Price"), array($searchCol), "display_event");
+        }
+        $searchSuccess = true;
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST)) {
@@ -44,11 +85,18 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['pageNo'])) {
 SQL;
 
         $deleteStatus = $db->con->query($queryStatement) ? true : false;
+        if ($db->con->errno == 1451) {
+            $parentKeyFail = true;
+        }
     }
 }
 
-$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), "", "display_event");
-$resultArr = $result;
+// search
+if (!$searchSuccess) {
+    $whereStatement = "TRUE ORDER BY $sortCol $sort";
+    $result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), $whereStatement, "display_event");
+    $resultArr = $result;
+}
 
 $pageCount = ceil(count($resultArr) / 10);
 ?>
@@ -65,7 +113,6 @@ $pageCount = ceil(count($resultArr) / 10);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
-    <link href="user.css" type="text/css" rel="stylesheet">
     <script>
         function toRedirect(eventTitle, location) {
             window.location = `${location}?Event_Title=${eventTitle}`;
@@ -127,19 +174,70 @@ $pageCount = ceil(count($resultArr) / 10);
     </div>
 
     <section class="text-white">
+        <!-- //Paste -->
+        <form class="mb-0 mx-3 row container mb-3" action="" method="GET">
+            <div class="col-md-4">
+                <input name="search" type="text" class="form-control" value="<?php if (isset($searchTerm)) echo $searchTerm ?>" placeholder="Search...">
+            </div>
+            <div class="col-md-2">
+                <select name="col_search" id="" class="form-select">
+                    <?php
+                    // search
+                    foreach ($colArray as $col => $headerName) {
+                        if (isset($searchCol) && $searchCol == $col) {
+                            echo "<option value='$col' selected>$headerName</option>";
+                        } else {
+                            echo "<option value='$col' >$headerName</option>";
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary" style="width: 50px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg>
+            </button>
+        </form>
         <h1>Events</h1>
 
         <?php
+        if (isset($parentKeyFail) && $parentKeyFail) {
+            echo "<h2 class='text-danger bg-light rounded-2 p-3 mx-3'>Event Title is used in either Bookmarks or Participants, please delete those records before proceeding. Please contact developer if above does not solve the issue</h2>";
+        }
         if (isset($deleteStatus) && $deleteStatus) {
             echo "<h2 class='text-danger bg-light rounded-2 p-3 mx-3'>Record Deleted</h2>";
+        }
+        if (count($resultArr) > 0) {
+            $resultCount = count($resultArr);
+            echo "<h2 class='text-primary bg-light rounded-2 p-3 mx-3'>$resultCount Record(s) found</h2>";
+        } else {
+            echo "<h2 class='text-secondary bg-light rounded-2 p-3 mx-3'>No Record found</h2>";
         }
         ?>
 
         <table class="event-list">
             <tr class="text-center">
-                <th width="15%">Event Title</th>
-                <th width="60%">Event Description</th>
-                <th width="10%">Event Price</th>
+                <?php
+                // search
+                $searchParams = "";
+                if ($searchSuccess) {
+                    $searchParams .= "&search={$searchTerm}&col_search={$searchCol}";
+                }
+                foreach ($colArray as $col => $headerName) {
+                    $tempSort = "ASC";
+                    if ($sortCol == $col) {
+                        $tempSort = $sort;
+                    }
+                    echo <<<HTML
+                    <th>
+                        <a href="{$_SERVER['PHP_SELF']}?pageNo=$pageNo&col=$col&sort=$tempSort">
+                        $headerName
+                        </a>
+                    </th>
+HTML;
+                }
+                ?>
                 <th width="15%">Actions</th>
             </tr>
 

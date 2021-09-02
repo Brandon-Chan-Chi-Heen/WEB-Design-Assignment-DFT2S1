@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
 
             // delete any existing img with the same name but different ext
 
-            $oldFile = glob("$docRoot/Event/{$_SESSION["cur_edit_key"]}.*")[0];
+            $oldFile = @glob("$docRoot/Event/{$_SESSION["cur_edit_key"]}.*")[0];
             unlink($oldFile);
             move_uploaded_file($file['tmp_name'], "$docRoot/Event/" . $save_as);
         }
@@ -155,7 +155,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
-    <link href="user.css" type="text/css" rel="stylesheet">
 </head>
 
 <body class="bg-dark">
@@ -169,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row">
 
             <div class="col-md-6">
-                <img src="<?php echo substr(glob("$docRoot/Event/{$_SESSION["cur_edit_key"]}.*")[0], strlen($docRoot) - strlen($sevRoot)); ?>" style="width:100%; height:100%" alt="">
+                <img src="<?php echo substr(@glob("$docRoot/Event/{$_SESSION["cur_edit_key"]}.*")[0], strlen($docRoot) - strlen($sevRoot)); ?>" style="width:100%; height:100%" alt="">
             </div>
             <div class="col-md-6">
 

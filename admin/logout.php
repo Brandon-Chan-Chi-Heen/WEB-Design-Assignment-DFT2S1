@@ -5,4 +5,4 @@ require_once "$docRoot/utility/utility.php";
 require_once "$docRoot/admin/admin_utility.php";
 
 unSetAdminSession();
-header("location: $sevRoot/admin/login.php");
+echo "<script>window.location='$sevRoot/admin/login.php';</script>";

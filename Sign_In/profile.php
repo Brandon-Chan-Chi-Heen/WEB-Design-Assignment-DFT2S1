@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES)) {
 
             // delete any existing img with the same name but different ext
 
-            $oldFile = glob("$docRoot/resources/{$_SESSION["userID"]}.*")[0];
+            $oldFile = @glob("$docRoot/resources/{$_SESSION["userID"]}.*")[0];
             unlink($oldFile);
             move_uploaded_file($file['tmp_name'], "$docRoot/resources/" . $save_as);
         }

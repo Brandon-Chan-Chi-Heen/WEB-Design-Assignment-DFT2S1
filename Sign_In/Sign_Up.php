@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . "/../env_variables.php";
 require_once "$docRoot/utility/utility.php";
 $isLogin = !empty($_SESSION['userID']) ? true : false;
 if ($isLogin) {
-    header("location: $sevRoot/index.php");
+    echo "<script>window.location='$sevRoot/index.php';</script>";
 }
 
 // post request
@@ -87,12 +87,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($validCredentials) {
             setSession($email);
-            header("location: $sevRoot/index.php");
+            echo "<script>window.location='$sevRoot/index.php';</script>";
         }
     }
 }
 
 ?>
+
 
 <!doctype html>
 <html lang="en">

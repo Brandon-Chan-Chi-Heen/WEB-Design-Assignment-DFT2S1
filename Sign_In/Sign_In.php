@@ -6,7 +6,7 @@ require_once "$docRoot/utility/utility.php";
 $isLogin = !empty($_SESSION['userID']) ? true : false;
 $emptyPassword = false;
 if ($isLogin) {
-    header("location: $sevRoot/index.php");
+    echo "<script>window.location='$sevRoot/index.php';</script>";
 }
 
 // post request

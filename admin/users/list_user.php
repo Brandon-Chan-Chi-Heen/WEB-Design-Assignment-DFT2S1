@@ -3,13 +3,34 @@ session_start();
 require_once dirname(__FILE__) . "/../../env_variables.php";
 include "$docRoot/utility/utility.php";
 include "../admin_utility.php";
+require_once "$docRoot/utility/search.php";
 include "$docRoot/admin/redirectNonAdmin.php";
-
 
 unsetEditSessions();
 
-$db = new Database();
-$result = $db->select(array("user_id", "email", "first_name", "last_name", "gender"), "", "user");
+// search
+$searchSuccess = false;
+$sorted = false;
+
+
+$colArray = array(
+    "user_id" => "User Id",
+    "email" => "Email",
+    "first_name" => "First Name",
+    "last_name" => "Last Name",
+    "gender" => "Gender"
+);
+$sortCol = "user_id";
+$sort = "ASC";
+$db =   new Database();
+$whereStatement = "";
+$result = $db->select(array(
+    "user_id",
+    "email",
+    "first_name",
+    "last_name",
+    "gender"
+), $whereStatement, "user");
 
 $pageCount = ceil(count($result) / 10);
 $pageNo = 1;
@@ -21,12 +42,43 @@ $pageNo = 1;
 //     }
 // }
 
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['pageNo'])) {
-    if ($_GET['pageNo'] >= 1 && $_GET['pageNo'] <= $pageCount) {
-        $pageNo = $_GET['pageNo'];
-    } else {
-        header("Location: $sevRoot/admin/users/list_user.php");
-        die();
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    if (isset($_GET['pageNo'])) {
+        if ($_GET['pageNo'] >= 1 && $_GET['pageNo'] <= $pageCount) {
+            $pageNo = $_GET['pageNo'];
+        } else {
+            echo "<script>window.location='$sevRoot/admin/users/list_user.php';</script>";
+            die();
+        }
+    }
+
+    if (!empty($_GET['col']) && !empty($_GET['sort'])) {
+        if (array_key_exists($_GET['col'], $colArray)) {
+            $sortCol = $_GET['col'];
+        } else {
+            $sortCol = $colArray[0];
+        }
+
+        $sort = ($_GET['sort'] == "ASC") ? "DESC" : "ASC";
+
+        // search
+        $sorted = true;
+    }
+
+    // search
+    if (!empty($_GET['search']) && !empty($_GET['col_search'])) {
+        $searchTerm = $_GET['search'];
+        if (array_key_exists($_GET['col_search'], $colArray)) {
+            $searchCol = $_GET['col_search'];
+        } else {
+            $searchCol = $colArray[0];
+        }
+        if ($sorted) {
+            $resultArr = search($searchTerm, array("user_id", "email", "first_name", "last_name", "gender"), array($searchCol), "user", $sortCol, $sort);
+        } else {
+            $resultArr = search($searchTerm, array("user_id", "email", "first_name", "last_name", "gender"), array($searchCol), "user");
+        }
+        $searchSuccess = true;
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST)) {
@@ -53,10 +105,17 @@ SQL;
         $deleteStatus = $db->con->query($queryStatement) ? true : false;
     }
 }
-$result = $db->select(array("user_id", "email", "first_name", "last_name", "gender"), "", "user");
-$resultArr = $result;
+
+// search
+if (!$searchSuccess) {
+    $whereStatement = "TRUE ORDER BY $sortCol $sort";
+    $result = $db->select(array("user_id", "email", "first_name", "last_name", "gender"), $whereStatement, "user");
+    $resultArr = $result;
+}
+
 
 $pageCount = ceil(count($resultArr) / 10);
+
 
 
 ?>
@@ -68,12 +127,11 @@ $pageCount = ceil(count($resultArr) / 10);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>List users</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="../index.css" type="text/css" rel="stylesheet">
-    <link href="user.css" type="text/css" rel="stylesheet">
     <script>
         function toRedirect(userId, location) {
             window.location = `${location}?user_id=${userId}`;
@@ -109,6 +167,7 @@ $pageCount = ceil(count($resultArr) / 10);
     <?php
     include_once "../sidebar.php";
     ?>
+
 
 
     <div class="modal" tabindex="-1" id="myModal">
@@ -153,26 +212,75 @@ $pageCount = ceil(count($resultArr) / 10);
     </div>
 
     <section class="text-white">
-        <h1>Users</h1>
+        <!-- //Paste -->
+        <form class="mb-0 mx-3 row container mb-3" action="" method="GET">
+            <div class="col-md-4">
+                <input name="search" type="text" class="form-control" value="<?php if (isset($searchTerm)) echo $searchTerm ?>" placeholder="Search...">
+            </div>
+            <div class="col-md-2">
+                <select name="col_search" id="" class="form-select">
+                    <?php
+                    // search
+                    foreach ($colArray as $col => $headerName) {
+                        if ($searchCol == $col) {
+                            echo "<option value='$col' selected>$headerName</option>";
+                        } else {
+                            echo "<option value='$col' >$headerName</option>";
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary" style="width: 50px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg>
+            </button>
+        </form>
+        <h1 class="mx-3">Users</h1>
 
         <?php
         if (isset($deleteStatus) && $deleteStatus) {
             echo "<h2 class='text-danger bg-light rounded-2 p-3 mx-3'>Record Deleted</h2>";
         }
+        if (count($resultArr) > 0) {
+            $resultCount = count($resultArr);
+            echo "<h2 class='text-primary bg-light rounded-2 p-3 mx-3'>$resultCount Record(s) found</h2>";
+        } else {
+            echo "<h2 class='text-secondary bg-light rounded-2 p-3 mx-3'>No Record found</h2>";
+        }
         ?>
 
         <table class="event-list">
             <tr class="text-center">
-                <th style="width:10%;">User ID
-                </th>
-                <th style="width:40%; text-align:left;">Email</th>
-                <th style="width:15%;">First Name</th>
-                <th style="width:15%;">Last Name</th>
-                <th style="width:5%;">Gender</th>
+                <?php
+
+                // search
+                $searchParams = "";
+                if ($searchSuccess) {
+                    $searchParams .= "&search={$searchTerm}&col_search={$searchCol}";
+                }
+                foreach ($colArray as $col => $headerName) {
+                    $tempSort = "ASC";
+                    if ($sortCol == $col) {
+                        $tempSort = $sort;
+                    }
+                    echo <<<HTML
+                    <th style="width:10%;">
+                        <!-- // search    $searchParams                                       ============= -->
+                        <a href="{$_SERVER['PHP_SELF']}?pageNo=$pageNo&col=$col&sort=$tempSort$searchParams">
+                        $headerName
+                        </a>
+                    </th>
+HTML;
+                }
+
+                ?>
                 <th style="width:15%;">Actions</th>
             </tr>
 
             <?php
+
 
             $startIndex = ($pageNo - 1) * 10;
             for ($i = $startIndex; $i < $startIndex + 10 && $i < count($resultArr); $i++) {

@@ -63,3 +63,12 @@ button.onclick + ul.subSideBar {
   overflow: hidden;
   animation: slide ease-in-out 0.5s forwards;
 }
+
+.hidden {
+  display: none;
+}
+
+#pageNoInput {
+  width: 100px;
+  text-align: center;
+}

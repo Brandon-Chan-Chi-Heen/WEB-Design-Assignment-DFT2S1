@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             (isset($_SESSION["userID"]) && $_GET["user_id"] == $_SESSION["userID"]) ||
             !empty($_SESSION["adminID"])
         ) {
-            $name = glob("$docRoot/resources/{$_GET["user_id"]}.*");
+            $name = @glob("$docRoot/resources/{$_GET["user_id"]}.*");
             if (count($name) == 0) {
                 $name = "$docRoot/resources/user_icon.png";
             } else {

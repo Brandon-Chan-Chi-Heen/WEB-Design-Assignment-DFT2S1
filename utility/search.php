@@ -8,8 +8,11 @@ require_once "$docRoot/utility/utility.php";
 
 // results 
 
-function search($toSearch, $colArray, $toSearchColArray, $table)
+function search($toSearch, $colArray, $toSearchColArray, $table, $orderCol = false, $sort = "ASC")
 {
+    if (!$orderCol) {
+        $orderCol = $colArray[0];
+    }
     $terms = explode(" ", $toSearch);
 
     // array unique
@@ -22,6 +25,7 @@ function search($toSearch, $colArray, $toSearchColArray, $table)
         }
     }
     $whereStatement = rtrim($whereStatement, " OR");
+    $whereStatement = "$whereStatement ORDER BY $orderCol $sort";
 
     consoleLog($whereStatement);
     $finalResult = $db->select($colArray, $whereStatement, $table);
