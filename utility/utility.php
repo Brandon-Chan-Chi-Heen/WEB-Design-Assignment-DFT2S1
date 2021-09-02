@@ -101,9 +101,9 @@ function processLogin($email, $password)
 class Database
 {
     private const DB_HOST = 'localhost';
-    private const DB_PASSWORD = 'E_0%0W4~P~|Oi7Vz';
-    private const DB_USER = 'id17525283_admin';
-    private const DB_NAME = 'id17525283_assignment';
+    private const DB_PASSWORD = '';
+    private const DB_USER = 'root';
+    private const DB_NAME = 'assignment';
 
     public $con;
     public $queryResult;
@@ -213,6 +213,7 @@ class Database
 
         $queryStatement .= ");";
 
+        consoleLog($queryStatement);
         $this->queryResult = $this->con->query($queryStatement);
 
         if (!empty($this->con->errno)) {

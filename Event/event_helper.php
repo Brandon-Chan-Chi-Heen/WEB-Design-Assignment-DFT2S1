@@ -4,11 +4,12 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'assignment');
-function getEventDetails() {
+function getEventDetails()
+{
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM display_event";
     if ($result = $con->query($sql)) {
-        if($result->fetch_object()){
+        if ($result->fetch_object()) {
             $result = $con->query($sql);
             while ($row = $result->fetch_object()) {
                 $rowcount = mysqli_num_rows($result);
@@ -25,8 +26,8 @@ function getEventDetails() {
                             <div class="Details">
                                 <div class="bookmarkButton">
                                     <h3>
-HELLO;                              
-                if(!empty($_SESSION['userID'])){
+HELLO;
+                if (!empty($_SESSION['userID'])) {
                     echo "<button onclick='bookmarkEvent(\"$eventTitle\",{$_SESSION['userID']})'>🔖</button>";
                 }
                 echo <<< HELLO
@@ -37,20 +38,19 @@ HELLO;
                             </div>
                             <div class="price">
                                 <h3>
-HELLO;                              
-                if(!empty($_SESSION['userID'])){
+HELLO;
+                if (!empty($_SESSION['userID'])) {
                     $addedQuantity = 1;
                     echo "<button onclick='addToCartFunction({$_SESSION['userID']},\"$eventTitle\",$addedQuantity,$price)' class='addToCart'>🛒</button>";
-                }
-                else{
+                } else {
                     echo <<< HELLO
                     <button onclick="document.location='../Sign_In/Sign_In.php'">🛒</button>
 HELLO;
                 }
                 echo <<< HELLO
                                     $$price</h3>
-HELLO;                              
-                if(!empty($_SESSION['userID'])){
+HELLO;
+                if (!empty($_SESSION['userID'])) {
                     echo <<< HELLO
                     <h3>
                     <form method="post" action="../Ticketing/Payment.php">
@@ -60,12 +60,11 @@ HELLO;
                     </form>
                     </h3>
 HELLO;
-                }
-                else{
+                } else {
                     echo <<< HELLO
                     <a href="../Sign_In/Sign_In.php" class="enrollNow"><h3>Enroll Now</h3></a>
 HELLO;
-                }  
+                }
                 echo <<< HELLO
                                 
                             </div>
@@ -73,12 +72,11 @@ HELLO;
                     </div>
 HELLO;
             }
-            if(isset($_POST['bookmarkAlert'])) {
-                    echo '<script>alert("Successfully added bookmark")</script>';
+            if (isset($_POST['bookmarkAlert'])) {
+                echo '<script>alert("Successfully added bookmark")</script>';
             }
             echo "<div class='result'><h2 style='color:red;'>$rowcount Results Found</h2></div>";
-        }
-        else {
+        } else {
             echo "<script type='text/javascript'>alert(`No Event Found.`);</script>";
             echo <<< HELLO
             <div class='result'>
@@ -91,21 +89,22 @@ HELLO;
     $con->close();
 }
 
-function getBookmarkedEvent($userID) {
+function getBookmarkedEvent($userID)
+{
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM bookmarks WHERE user_id = $userID";
     if ($result = $con->query($sql)) {
-        if($result->fetch_object()){
+        if ($result->fetch_object()) {
             $result = $con->query($sql);
             while ($bookmarkrow = $result->fetch_object()) {
                 $sql2 = "SELECT * FROM display_event WHERE Event_Title = '$bookmarkrow->Event_Title'";
-                    if ($result2 = $con->query($sql2)) {
-                        while ($bookmark = $result2->fetch_object()) {
-                            $eventTitle = $bookmark->Event_Title;
-                            $eventDesc = $bookmark->Event_Description;
-                            $eventPrice = $bookmark->Event_Price;
-                            $rowcount = mysqli_num_rows($result);
-                            echo <<< HTML
+                if ($result2 = $con->query($sql2)) {
+                    while ($bookmark = $result2->fetch_object()) {
+                        $eventTitle = $bookmark->Event_Title;
+                        $eventDesc = $bookmark->Event_Description;
+                        $eventPrice = $bookmark->Event_Price;
+                        $rowcount = mysqli_num_rows($result);
+                        echo <<< HTML
                             <div class="Event">
                                 <div  class="col-1-3 specials">
                                 <img src="$eventTitle.jpg" alt="eventTitle Picture" class="picture"/>
@@ -122,22 +121,21 @@ function getBookmarkedEvent($userID) {
                                     </div>
                                     <div class="price">
                                         <h3>
-HTML;                    
-                                    if(!empty($_SESSION['userID'])){
-                                        $addedQuantity = 1;
-                                        echo "<button onclick='addToCartFunction({$_SESSION['userID']},\"$eventTitle\",$addedQuantity,$bookmark->Event_Price)' class='addToCart'>🛒</button>";
-                                    }
-                                    else{
-                                        echo <<< HELLO
+HTML;
+                        if (!empty($_SESSION['userID'])) {
+                            $addedQuantity = 1;
+                            echo "<button onclick='addToCartFunction({$_SESSION['userID']},\"$eventTitle\",$addedQuantity,$bookmark->Event_Price)' class='addToCart'>🛒</button>";
+                        } else {
+                            echo <<< HELLO
                                         <button onclick="document.location='../Sign_In/Sign_In.php'">🛒</button>
 HELLO;
-                                    }
-                                    echo <<< HELLO
+                        }
+                        echo <<< HELLO
                                     $$eventPrice</h3>
-HELLO;                              
-                                    if(!empty($_SESSION['userID'])){
-                                        $_SESSION['EventTittle'] = $eventTitle;
-                                        echo <<< HELLO
+HELLO;
+                        if (!empty($_SESSION['userID'])) {
+                            $_SESSION['EventTittle'] = $eventTitle;
+                            echo <<< HELLO
                                         <h3>
                                         <form method="post" action="../Ticketing/Payment.php">
                                             <input type="hidden" name="EventTittle"value="$eventTitle">
@@ -146,24 +144,22 @@ HELLO;
                                         </form>
                                         </h3>
 HELLO;
-                                    }
-                                    else{
-                                        echo <<< HELLO
+                        } else {
+                            echo <<< HELLO
                                         <a href="../Sign_In/Sign_In.php" class="enrollNow"><h3>Enroll Now</h3></a>
 HELLO;
-                                    }  
-                                    echo <<< HELLO
+                        }
+                        echo <<< HELLO
                                                 </div>
                                             </div>
                                         </div>
 HELLO;
-                                    }
                     }
+                }
                 $result2->free();
             }
             echo "<div class='result'><h2>$rowcount Results Found</h2></div>";
-        }
-        else{
+        } else {
             echo "<script type='text/javascript'>alert(`No Result Found.`);</script>";
             echo <<< HELLO
             <div class='result'>

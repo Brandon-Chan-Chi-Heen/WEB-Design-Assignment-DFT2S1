@@ -17,7 +17,7 @@
                 echo <<< HTML
                     <tr>
                       <td>
-HTML;           
+HTML;
                 if(!empty($userID)){
                     echo "<button onclick='removeCart($userID,\"$eventTitle\")'>X</button>";
                 }
@@ -28,7 +28,7 @@ HTML;
                       <td>RM$eventPrice</td>
                       <td>RM$totalEventPrice</td>
                     </tr>
-                    
+
 HTML;
             }
             echo <<< HTML
@@ -41,5 +41,3 @@ HTML;
         $result->free();
         $con->close();
     }
-?>
-
