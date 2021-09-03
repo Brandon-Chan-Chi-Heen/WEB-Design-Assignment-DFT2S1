@@ -39,11 +39,7 @@ CREATE TABLE `administrator` (
 --
 
 INSERT INTO `administrator` (`admin_id`, `password`, `first_name`, `last_name`) VALUES
-('1', '1', 'brandon', 'chan'),
-('2', '1', 'e', 'Chan Chi'),
-('3', '1', 'k', 'sss'),
-('6', '2', 'k', 'Chan Chi Heen'),
-('60', '1', 'Brandon', 'Chan Chi Heen');
+('1', '1', 'brandon', 'chan');
 
 -- --------------------------------------------------------
 
@@ -57,13 +53,6 @@ CREATE TABLE `bookmarks` (
   `Event_Title` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `bookmarks`
---
-
-INSERT INTO `bookmarks` (`bookmark_id`, `user_id`, `Event_Title`) VALUES
-(3, 1, '3 Wealth Creation Strategies'),
-(4, 1, 'Financial Leteracy Workshop');
 
 -- --------------------------------------------------------
 
@@ -82,11 +71,6 @@ CREATE TABLE `cart` (
 -- Dumping data for table `cart`
 --
 
-INSERT INTO `cart` (`user_id`, `Event_Title`, `quantity`, `price`) VALUES
-(15, '3 Wealth Creation Strategies', 1, 33),
-(15, 'Employee Investor Program', 1, 16.95),
-(15, 'Financial Leteracy Workshop', 1, 24.95);
-
 -- --------------------------------------------------------
 
 --
@@ -95,7 +79,7 @@ INSERT INTO `cart` (`user_id`, `Event_Title`, `quantity`, `price`) VALUES
 
 CREATE TABLE `event` (
   `Event_Title` varchar(30) NOT NULL,
-  `Event_Description` text NOT NULL,
+  `Event_Description` varchar(400) NOT NULL,
   `Event_Price` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -121,8 +105,8 @@ CREATE TABLE `participants` (
   `user_id` int(8) NOT NULL,
   `Event_Title_FK` varchar(30) NOT NULL,
   `gender` varchar(1) NOT NULL,
-  `first_name` text NOT NULL,
-  `last_name` text NOT NULL
+  `first_name` varchar(30) NOT NULL,
+  `last_name` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -144,10 +128,10 @@ INSERT INTO `participants` (`participant_id`, `user_id`, `Event_Title_FK`, `gend
 
 CREATE TABLE `user` (
   `user_id` int(30) NOT NULL,
-  `email` text NOT NULL,
-  `first_name` text NOT NULL,
-  `last_name` text NOT NULL,
-  `password` text NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `first_name` varchar(30) NOT NULL,
+  `last_name` varchar(30) NOT NULL,
+  `password` varchar(30) NOT NULL,
   `gender` varchar(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -156,10 +140,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `email`, `first_name`, `last_name`, `password`, `gender`) VALUES
-(1, 'heenbrandon@gmail.com', 'hi1', 'bye1', 'qqq1', 'M'),
-(8, 'brandoncch-wm20@student.tarc.edu.my2', 'hi', 'fefwe', '2', 'M'),
-(14, 'brandoncch-wm20@student.tarc.edu.m222222222222', 'Brandon', 'Chan Chi Heen', '1', ''),
-(15, 'heejh-wm20@student.tarc.edu.my', 'Hee', 'Jun Hua', '1', 'M');
+(1, 'heenbrandon@gmail.com', 'hi1', 'bye1', 'qqq1', 'M');
 
 --
 -- Indexes for dumped tables
@@ -216,7 +197,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `bookmarks`
 --
 ALTER TABLE `bookmarks`
-  MODIFY `bookmark_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `bookmark_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `participants`
@@ -228,7 +209,7 @@ ALTER TABLE `participants`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `user_id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
