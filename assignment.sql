@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 05, 2021 at 05:58 PM
+-- Generation Time: Sep 05, 2021 at 06:03 PM
 -- Server version: 10.4.19-MariaDB
 -- PHP Version: 7.3.28
 
@@ -117,8 +117,9 @@ INSERT INTO `participants` (`participant_id`, `user_id`, `Event_Title_FK`, `gend
 (2, 2, '3 Wealth Creation Strategies', 'M', 'Hee', 'Jun Hua'),
 (3, 3, 'Employee Investor Program', 'M', 'Ali', 'Bin Abu'),
 (8, 1, '3 Wealth Creation Strategies', 'M', 'Brandon', 'Chan Chi Heen'),
-(9, 4, 'Employee Investor Program', '', 'Nam', 'Kue Hueh'),
-(10, 5, 'Investing Note Trading Cup', '', 'Hue', 'Huehue');
+(11, 4, 'Financial Leteracy Workshop', 'F', 'Nam', 'Kue Hueh'),
+(13, 1, 'Employee Investor Program', 'M', 'Brandon', 'Chan Chi Heen'),
+(14, 5, 'Investing Note Trading Cup', 'F', 'Hue', 'Huehue');
 
 -- --------------------------------------------------------
 
@@ -208,7 +209,7 @@ ALTER TABLE `bookmarks`
 -- AUTO_INCREMENT for table `participants`
 --
 ALTER TABLE `participants`
-  MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `participant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `user`
