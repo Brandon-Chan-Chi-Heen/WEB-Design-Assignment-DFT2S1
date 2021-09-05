@@ -38,7 +38,7 @@ include "$docRoot/admin/redirectNonAdmin.php";
             </tr>
             <?php
             $db = new Database();
-            $result = $db->select(array("*"), "", "display_event");
+            $result = $db->select(array("*"), "", "event");
 
             foreach ($result as $row) {
                 echo <<<HTML

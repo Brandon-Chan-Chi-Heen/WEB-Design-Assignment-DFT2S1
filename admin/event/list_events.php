@@ -22,7 +22,7 @@ $sortCol = "Event_Title";
 $sort = "ASC";
 $db = new Database();
 $whereStatement = "";
-$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), $whereStatement, "display_event");
+$result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), $whereStatement, "event");
 
 $pageCount = ceil(count($result) / 10);
 $pageNo = 1;
@@ -63,9 +63,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $searchCol = $colArray[0];
         }
         if ($sorted) {
-            $resultArr = search($searchTerm, array("Event_Title", "Event_Description", "Event_Price"), array($searchCol), "display_event", $sortCol, $sort);
+            $resultArr = search($searchTerm, array("Event_Title", "Event_Description", "Event_Price"), array($searchCol), "event", $sortCol, $sort);
         } else {
-            $resultArr = search($searchTerm, array("Event_Title", "Event_Description", "Event_Price"), array($searchCol), "display_event");
+            $resultArr = search($searchTerm, array("Event_Title", "Event_Description", "Event_Price"), array($searchCol), "event");
         }
         $searchSuccess = true;
     }
@@ -79,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         }
 
         $queryStatement = <<<SQL
-        DELETE FROM display_event
+        DELETE FROM event
         WHERE 
         Event_Title = '$eventTitle';
 SQL;
@@ -94,7 +94,7 @@ SQL;
 // search
 if (!$searchSuccess) {
     $whereStatement = "TRUE ORDER BY $sortCol $sort";
-    $result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), $whereStatement, "display_event");
+    $result = $db->select(array("Event_Title", "Event_Description", "Event_Price"), $whereStatement, "event");
     $resultArr = $result;
 }
 

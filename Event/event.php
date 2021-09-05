@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
         $search = $_GET["search"];
         $colArray = array("Event_Title", "Event_Description", "Event_Price");
         $toSearchColArray = array("Event_Title");
-        $searchResult = search($search, $colArray, $toSearchColArray, "display_event");
+        $searchResult = search($search, $colArray, $toSearchColArray, "event");
     }
 }
 ?>

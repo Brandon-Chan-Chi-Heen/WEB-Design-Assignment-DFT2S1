@@ -128,7 +128,7 @@ class Database
             "password",
             "gender"
         ),
-        "display_event" => array(
+        "event" => array(
             "Event_Title",
             "Event_Description",
             "Event_Price"
