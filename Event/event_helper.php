@@ -7,7 +7,7 @@ define('DB_NAME', 'assignment');
 function getEventDetails()
 {
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    $sql = "SELECT * FROM display_event";
+    $sql = "SELECT * FROM event";
     if ($result = $con->query($sql)) {
         if ($result->fetch_object()) {
             $result = $con->query($sql);
@@ -97,7 +97,7 @@ function getBookmarkedEvent($userID)
         if ($result->fetch_object()) {
             $result = $con->query($sql);
             while ($bookmarkrow = $result->fetch_object()) {
-                $sql2 = "SELECT * FROM display_event WHERE Event_Title = '$bookmarkrow->Event_Title'";
+                $sql2 = "SELECT * FROM event WHERE Event_Title = '$bookmarkrow->Event_Title'";
                 if ($result2 = $con->query($sql2)) {
                     while ($bookmark = $result2->fetch_object()) {
                         $eventTitle = $bookmark->Event_Title;

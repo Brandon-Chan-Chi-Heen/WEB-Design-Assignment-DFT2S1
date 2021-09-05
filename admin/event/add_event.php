@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $db->insert(
                     array("Event_Title", "Event_Description", "Event_Price"),
                     array($eventTitle, $eventDescription, $price),
-                    "display_event"
+                    "event"
                 );
                 $insertSuccess = true;
             } catch (Exception $e) {

@@ -18,7 +18,7 @@ JAVASCRIPT;
 }
 
 $db = new Database();
-$result = $db->select(array('Event_Title', 'Event_Description', 'Event_Price'), "Event_Title = '{$_SESSION['cur_edit_key']}'", 'display_event')[0];
+$result = $db->select(array('Event_Title', 'Event_Description', 'Event_Price'), "Event_Title = '{$_SESSION['cur_edit_key']}'", 'event')[0];
 [$eventTitle, $eventDescription, $eventPrice] = $result;
 
 function validationCheck($changeArray, $colName)
@@ -127,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         foreach ($changeArray as $col => $value) {
             if ($value["change_status"] && !empty($value["value"])) {
-                $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'display_event');
+                $changeArray[$col]["updated_status"] = $db->update(array($col), array($value["value"]), $whereStatement, 'event');
             }
             if ($col == "Event_Title" && $changeArray["Event_Title"]["updated_status"]) {
                 $_SESSION['cur_edit_key'] = $changeArray["Event_Title"]["value"];
@@ -135,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $result = $db->select(array('Event_Title', 'Event_Description', 'Event_Price'), "Event_Title = '{$_SESSION['cur_edit_key']}'", 'display_event')[0];
+        $result = $db->select(array('Event_Title', 'Event_Description', 'Event_Price'), "Event_Title = '{$_SESSION['cur_edit_key']}'", 'event')[0];
         [$eventTitle, $eventDescription, $eventPrice] = $result;
         $db->disconnect();
     }

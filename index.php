@@ -84,7 +84,7 @@ if (isset($_SESSION)) {
                     <?php
                     $db = new Database();
                     $col = array("Event_Title", "Event_Description", "Event_Price");
-                    $result = $db->select($col, "", "display_event");
+                    $result = $db->select($col, "", "event");
 
                     foreach ($result as $row) {
                         echo <<<HTML

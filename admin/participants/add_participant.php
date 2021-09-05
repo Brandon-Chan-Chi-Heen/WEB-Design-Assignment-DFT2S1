@@ -7,7 +7,7 @@ include "$docRoot/admin/redirectNonAdmin.php";
 
 
 $db = new Database();
-$eventTitleArray = $db->select(array('Event_Title'), "", "display_event");
+$eventTitleArray = $db->select(array('Event_Title'), "", "event");
 $userIDArray = $db->select(array('user_id'), "", "user");
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
