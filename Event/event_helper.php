@@ -1,11 +1,11 @@
 <?php
-require_once '../utility/utility.php';
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'assignment');
 function getEventDetails()
 {
+    global $docRoot, $sevRoot;
     $con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     $sql = "SELECT * FROM event";
     if ($result = $con->query($sql)) {
@@ -16,11 +16,12 @@ function getEventDetails()
                 $eventDesc = $row->Event_Description;
                 $eventTitle = $row->Event_Title;
                 $price = $row->Event_Price;
+                $imglink = substr(@glob("$docRoot/Event/$eventTitle.*")[0], strlen($docRoot) - strlen($sevRoot));
                 //Event Details
-                echo <<< HELLO
+                echo <<<HELLO
                     <div class="Event">
                         <div  class="col-1-3 specials">
-                        <img src="$eventTitle.jpg" alt="" class="picture"/>
+                        <img src="$imglink" alt="" class="picture"/>
                         </div>
                         <div class="col-2-3 specials">
                             <div class="Details">

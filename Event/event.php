@@ -72,10 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
                 foreach ($searchResult as $result) {
                     $resultCount++;
                     [$eventTitle, $eventDescription, $eventPrice] = $result;
+                    $imglink = substr(@glob("$docRoot/Event/$eventTitle.*")[0], strlen($docRoot) - strlen($sevRoot));
                     echo <<< HELLO
                             <div class="Event">
                             <div class="col-1-3 specials">
-                                <img src="$eventTitle.jpg" alt="" class="picture" />
+                                <img src="$imglink" alt="" class="picture" />
                             </div>
                             <div class="col-2-3 specials">
                                 <div class="Details">
