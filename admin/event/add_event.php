@@ -74,8 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $validData = $validEventTitle && $validEventDescription && $validPrice;
 
-        // attempt to register
-        // error upon same email
 
         // variables for error handling
         $duplicateEvent = false;
@@ -209,7 +207,7 @@ HTML;
             ?>
 
             <div class="col-12">
-                <button class="btn btn-primary" type="submit">Register</button>
+                <button class="btn btn-primary" type="submit">Add Record</button>
                 <?php
                 if (isset($insertSuccess) && $insertSuccess) {
                     echo <<<HTML

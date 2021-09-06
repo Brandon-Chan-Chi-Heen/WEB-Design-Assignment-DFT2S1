@@ -192,7 +192,7 @@ HTML;
             ?>
 
             <div class="col-12">
-                <button class="btn btn-primary" type="submit">Register</button>
+                <button class="btn btn-primary" type="submit">Add admin</button>
                 <?php
                 if (isset($addSuccess) && $addSuccess) {
                     echo <<<HTML

@@ -1,39 +1,59 @@
 # WEB-Design-Assignment-DFT2S1
 
-```diff
-- Regarding SCSS
-- If you dont know how to setup SASS and compile, just edit the index.css file directly. I'll fix that later
+User Login Credentials
+User : heejunhua@gmail.com
+Password : 1234
 
-- I'm using VS code instead of Netbeans so if you wanna setup in VS code I can help you.
-```
+link: localhost/WEB-Design-Assignment-DFT2S1/Sign_In/Sign_in.php
 
+Admin Login Credentials
+User: 1
+Password: 1
 
-edit 1:
-Ignore the above. <br />
+link : localhost/WEB-Design-Assignment-DFT2S1/admin/login.php
 
-# NOTE 1
-Please require env_variables.php in all your files. <br />
+everything under admin cart not done,
 
-change sevRoot accordingly <br />
-sevRoot : use this for any href links or resource(images) hyperlinks<br /> 
-ex: <br />
-```"<img src="$sevRoot/resources/user_icon.png" alt="user" width="32" height="32" class="rounded-circle mx-2">```
+Responsibilities (Finished Only):
+-- FRONTEND --
+Brandon
 
-docRoot: use this for php functions such as include, require, etc <br />
+- Main page
+- main page Search function
+- User Login
+- User Register
+- user Profile
+- User Sign Out
 
-php will complain if you try something like <br />
-```php
-require("/utility/utility.php");
-``` 
-<br />
+Jun Hua
 
-above will break because php will search from your pc instead of server path
+- Event Page, addding to cart, removing from cart (basic template because Debin didnt do his part)
+- Event Bookmark viewing, adding, Updating, and Deleting bookmarks
+- Event Bookmark Page
+-
 
-ignore below, used for this document's coloring
-```diff
-- text in red
-+ text in green
-! text in orange
-# text in gray
-@@ text in purple (and bold)@@
-```
+De Bin
+
+- in charge of the pages under /Ticketing
+- Did the pages except of removeCart.php,Cart.php,Payment.php, and helper.php(done by Jun Hua for the purposes of his module)
+
+Responsibilities (Finished Only):
+-- BACKEND --
+Brandon
+
+- Admin Home Page
+- All pages Search function
+- Admin Login
+- Admin Logout
+- Listing User Records, adding user records, updating user records, deleting user records
+- Listing Admin Records, adding admins, updating admin records, deleting admin records
+
+Jun Hua
+
+- Event Viewing, adding, updating, and deleting events
+- User Bookmark viewing, adding, Updating, and Deleting bookmarks
+- Participant viewing, adding, updating and delete
+
+De Bin
+
+- Not available
