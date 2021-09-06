@@ -12,9 +12,9 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // ex: project in C:\xampp\htdocs\assignment\
 // sevRoot = "\assignment"
-// docRoot = "C:\xampp\htdocs" . "\assignment" = "C:\xampp\htdocs\assignment"
-$sevRoot = "/WEB-Design-Assignment-DFT2S1-main";
-$docRoot = $_SERVER['DOCUMENT_ROOT'] . $sevRoot;
+// docRoot = "C:\xampp\htdocs"
+$docRoot = dirname(__FILE__);
+$sevRoot = substr($docRoot, strlen($_SERVER['DOCUMENT_ROOT']));
 if (!isset($isLogin) || empty($isLogin)) {
     $isLogin = !empty($_SESSION['userID']) ? true : false;
 }
