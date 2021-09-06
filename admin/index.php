@@ -11,7 +11,7 @@ include "$docRoot/admin/redirectNonAdmin.php";
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>index</title>
+    <title>Dash Board</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -23,39 +23,53 @@ include "$docRoot/admin/redirectNonAdmin.php";
 
     <?php
     include "sidebar.php";
+
+    $db = new Database();
     ?>
     <section class="text-white">
-        <h1>Events</h1>
+        <h1>Dash Board</h1>
 
-        <button class="btn btn-primary">Create New Event</button>
-        <table class="event-list">
-            <tr>
-                <th style="width:40%;">Event Name</th>
-                <th style="width:15%;">Fee</th>
-                <th style="width:15%;">Number of Participants</th>
-                <th style="width:15%;">Max slots</th>
-                <th style="width:20%;">Actions</th>
-            </tr>
-            <?php
-            $db = new Database();
-            $result = $db->select(array("*"), "", "event");
+        <div class="row container text-dark">
+            <div class="row col-md-6 wrapper-div">
+                <div class="rounded bg-white inner-div">
+                    <h3>
+                        <span class="text-primary">Number of Users :</span>
+                        <?php
+                        $result = $db->select(array("*"), "", "user");
+                        echo count($result);
 
-            foreach ($result as $row) {
-                echo <<<HTML
-                <tr>
-                    <td>{$row[0]}</td>
-                    <td>{$row[2]}</td>
-                    <td>Number of Participants</td>
-                    <td>Max slots</td>
-                    <td>
-                        <button class="btn btn-primary">Edit</button>
-                        <button class="btn btn-danger">Delete</button>
-                    </td>
-                </tr>
-HTML;
-            }
-            ?>
-        </table>
+                        ?>
+                    </h3>
+                </div>
+                <div class="rounded bg-white inner-div">
+                    <h3>
+                        <span class="text-primary">Number of Participants :</span>
+
+                        <?php
+                        $result = $db->select(array("*"), "", "participants");
+                        echo count($result);
+
+                        ?>
+                    </h3>
+
+                </div>
+            </div>
+            <div class="row col-md-6 wrapper-div">
+                <div class="rounded bg-white inner-div">
+                    <h3>
+                        <span class="text-primary">Number of Events :</span>
+
+                        <?php
+                        $result = $db->select(array("*"), "", "event");
+                        echo count($result);
+
+                        ?>
+                    </h3>
+
+                </div>
+            </div>
+        </div>
+
     </section>
 </body>
 

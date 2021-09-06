@@ -1,3 +1,4 @@
+/* header */
 .form-control-dark:focus {
   color: #fff;
   background-color: var(--bs-dark);
@@ -7,6 +8,7 @@
 .dropdown-toggle {
   outline: 0;
 }
+/* carousel */
 
 #myCarousel {
   min-height: 900px;
@@ -19,9 +21,13 @@ img.carousel-img {
   width: 100%;
 }
 
+/*  album */
+
 .bd-placeholder-img {
   font-size: 1.125rem;
   text-anchor: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   user-select: none;
 }
 
@@ -35,6 +41,8 @@ img.carousel-img {
   border: 1px solid rgba(21, 25, 29, 0.9);
 }
 
+/* footer */
+
 .border-top {
   border-top: 1px solid #95bbe2 !important;
 }
@@ -42,4 +50,3 @@ img.carousel-img {
 .border-bottom {
   border-bottom: 1px solid #dee2e6 !important;
 }
-/*# sourceMappingURL=index.css.map */
