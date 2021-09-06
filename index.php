@@ -40,7 +40,7 @@ if (isset($_SESSION)) {
 
                     <div class="container">
                         <div class="carousel-caption text-start">
-                            <p><a class="btn btn-lg btn-primary" href="#">Sign up today</a></p>
+                            <p><a class="btn btn-lg btn-primary" href="Sign_In/Sign_Up.php">Sign up today</a></p>
                         </div>
                     </div>
                 </div>
@@ -95,9 +95,10 @@ if (isset($_SESSION)) {
                                     <p style="overflow: hidden; text-overflow: ellipsis; max-height: 150px;"  class="card-text text-dark">{$row[1]}</p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-primary">Read More...</button>
+                                            <button type="button" class="btn btn-sm btn-primary" >
+                                                <a href="Event/event.php" class="text-white text-decoration-none">Read More...</a>
+                                            </button>
                                         </div>
-                                        <small class="text-muted">9th September</small>
                                     </div>
                                 </div>
                             </div>
