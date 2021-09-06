@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                 $resultArr = array_merge($resultArr, search($value, array('user_id', 'first_name', 'last_name', 'gender'), array($colArray[$key]), "user"));
             }
         }
-        array_unique($resultArr, SORT_REGULAR);
+        $resultArr = array_map("unserialize", array_unique(array_map("serialize", $resultArr)));
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST)) {
