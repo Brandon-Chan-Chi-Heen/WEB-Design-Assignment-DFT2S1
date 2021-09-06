@@ -189,7 +189,7 @@ HTML;
             ?>
 
             <div class="col-12">
-                <button class="btn btn-primary" type="submit">Register</button>
+                <button class="btn btn-primary" type="submit">Add User</button>
                 <?php
                 if (isset($registerSuccess) && $registerSuccess) {
                     echo <<<HTML
